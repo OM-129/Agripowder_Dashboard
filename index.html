@@ -1,0 +1,1873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AgriPowder Intelligence — Product Database</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#080c14;--bg2:#0d1320;--card:#111827;--card2:#161f2e;
+    --border:#1e2d45;--border2:#243650;
+    --accent:#3b82f6;--accent2:#60a5fa;--accent3:#1d4ed8;
+    --gold:#f59e0b;--gold2:#fbbf24;
+    --teal:#0d9488;--teal2:#2dd4bf;
+    --rose:#e11d48;--rose2:#fb7185;
+    --violet:#7c3aed;--violet2:#a78bfa;
+    --text:#e2e8f0;--text2:#94a3b8;--text3:#475569;
+    --radius:12px;--radius2:8px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;
+    min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden;}
+
+  /* ── scrollbar ── */
+  ::-webkit-scrollbar{width:5px;height:5px;}
+  ::-webkit-scrollbar-track{background:var(--bg2);}
+  ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px;}
+
+  /* ── HEADER ── */
+  .header{
+    background:linear-gradient(90deg,#080c14 0%,#0d1320 60%,#0a1224 100%);
+    border-bottom:1px solid var(--border);
+    padding:14px 28px;display:flex;align-items:center;
+    justify-content:space-between;position:sticky;top:0;z-index:200;
+    backdrop-filter:blur(12px);
+  }
+  .logo{display:flex;align-items:center;gap:12px;}
+  .logo-icon{width:40px;height:40px;border-radius:10px;
+    background:linear-gradient(135deg,var(--accent3),var(--accent2));
+    display:flex;align-items:center;justify-content:center;
+    font-size:20px;box-shadow:0 0 20px rgba(59,130,246,.35);}
+  .logo-text{font-family:'Barlow Condensed',sans-serif;font-size:20px;
+    font-weight:800;color:var(--text);letter-spacing:.5px;line-height:1;}
+  .logo-sub{font-size:11px;color:var(--text3);font-weight:400;margin-top:2px;}
+  .header-stats{display:flex;gap:28px;}
+  .hstat{text-align:center;}
+  .hstat-val{font-family:'Barlow Condensed',sans-serif;font-size:18px;
+    font-weight:700;color:var(--accent2);}
+  .hstat-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;}
+
+  /* ── LAYOUT ── */
+  .layout{display:flex;flex:1;height:calc(100vh - 68px);}
+
+  /* ── SIDEBAR ── */
+  .sidebar{
+    width:280px;min-width:280px;
+    background:var(--bg2);border-right:1px solid var(--border);
+    display:flex;flex-direction:column;overflow:hidden;
+  }
+  .sb-top{padding:16px;}
+  .search-wrap{position:relative;}
+  .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);
+    color:var(--text3);font-size:14px;}
+  .search{width:100%;background:var(--card);border:1px solid var(--border);
+    color:var(--text);border-radius:var(--radius2);padding:9px 12px 9px 34px;
+    font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:.2s;}
+  .search:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(59,130,246,.2);}
+  .cat-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;}
+  .pill{background:transparent;border:1px solid var(--border);color:var(--text2);
+    border-radius:99px;padding:4px 12px;font-size:11px;cursor:pointer;
+    font-family:'DM Sans',sans-serif;font-weight:500;transition:.2s;}
+  .pill.active,.pill:hover{background:var(--accent3);border-color:var(--accent);color:#fff;}
+  .sb-list{flex:1;overflow-y:auto;padding:0 8px 16px;}
+  .prod-card{
+    display:flex;align-items:center;gap:10px;
+    padding:10px 12px;border-radius:10px;cursor:pointer;
+    border:1px solid transparent;margin-bottom:4px;transition:.15s;
+    position:relative;
+  }
+  .prod-card:hover{background:var(--card);border-color:var(--border);}
+  .prod-card.active{background:var(--card2);border-color:var(--accent);
+    box-shadow:0 0 0 1px rgba(59,130,246,.15);}
+  .prod-id{font-family:'Barlow Condensed',sans-serif;font-size:16px;
+    font-weight:700;color:var(--text3);width:26px;min-width:26px;text-align:right;}
+  .prod-card.active .prod-id{color:var(--accent2);}
+  .prod-thumb{width:36px;height:36px;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;font-size:18px;
+    background:var(--bg);border:1px solid var(--border);}
+  .prod-info{flex:1;min-width:0;}
+  .prod-name{font-size:13px;font-weight:600;color:var(--text);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .prod-meta{font-size:10px;color:var(--text3);margin-top:2px;}
+  .prod-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;
+    text-transform:uppercase;letter-spacing:.3px;}
+  .badge-a{background:rgba(245,158,11,.15);color:var(--gold2);}
+  .badge-b{background:rgba(71,85,105,.2);color:#94a3b8;}
+  .demand-dot{width:7px;height:7px;border-radius:50%;margin-left:auto;flex-shrink:0;}
+
+  /* ── MAIN CONTENT ── */
+  .main{flex:1;overflow-y:auto;padding:24px 28px;}
+
+  /* ── WELCOME SCREEN ── */
+  .welcome{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    height:100%;text-align:center;gap:20px;
+  }
+  .welcome-icon{font-size:64px;animation:float 3s ease-in-out infinite;}
+  @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+  .welcome h2{font-family:'Barlow Condensed',sans-serif;font-size:32px;
+    font-weight:700;color:var(--text);}
+  .welcome p{color:var(--text2);font-size:15px;max-width:380px;line-height:1.6;}
+  .quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;
+    max-width:600px;margin-top:8px;}
+  .quick-item{background:var(--card);border:1px solid var(--border);
+    border-radius:var(--radius);padding:16px;cursor:pointer;transition:.2s;text-align:center;}
+  .quick-item:hover{border-color:var(--accent);transform:translateY(-2px);}
+  .quick-item .qi-icon{font-size:24px;margin-bottom:8px;}
+  .quick-item .qi-name{font-size:12px;font-weight:600;color:var(--text);}
+  .quick-item .qi-id{font-size:11px;color:var(--text3);}
+
+  /* ── PRODUCT DETAIL ── */
+  .detail{display:none;flex-direction:column;gap:20px;animation:fadeIn .3s ease;}
+  .detail.show{display:flex;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+  /* ── DETAIL HEADER ── */
+  .detail-header{
+    background:linear-gradient(135deg,var(--card) 0%,var(--card2) 100%);
+    border:1px solid var(--border);border-radius:16px;padding:24px 28px;
+    display:flex;align-items:center;gap:20px;position:relative;overflow:hidden;
+  }
+  .dh-bg{position:absolute;right:-20px;top:-20px;width:120px;height:120px;
+    border-radius:50%;opacity:.06;background:var(--accent);}
+  .dh-icon{width:64px;height:64px;border-radius:14px;
+    display:flex;align-items:center;justify-content:center;font-size:32px;
+    background:var(--bg);border:1px solid var(--border);flex-shrink:0;
+    box-shadow:0 4px 20px rgba(0,0,0,.4);}
+  .dh-info{flex:1;}
+  .dh-title{font-family:'Barlow Condensed',sans-serif;font-size:32px;
+    font-weight:800;color:var(--text);line-height:1;}
+  .dh-sci{font-size:13px;color:var(--text3);font-style:italic;margin-top:4px;}
+  .dh-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+  .tag{font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;
+    text-transform:uppercase;letter-spacing:.3px;}
+  .tag-cat{background:rgba(59,130,246,.15);color:var(--accent2);border:1px solid rgba(59,130,246,.3);}
+  .tag-sub{background:rgba(13,148,136,.15);color:var(--teal2);border:1px solid rgba(13,148,136,.3);}
+  .tag-demand{border:1px solid;}
+  .dh-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;flex-shrink:0;}
+  .dh-kpi{background:var(--bg);border:1px solid var(--border);border-radius:10px;
+    padding:12px 16px;text-align:center;}
+  .dh-kpi-val{font-family:'Barlow Condensed',sans-serif;font-size:22px;
+    font-weight:700;line-height:1;}
+  .dh-kpi-lbl{font-size:10px;color:var(--text3);margin-top:4px;
+    text-transform:uppercase;letter-spacing:.4px;}
+
+  /* ── TABS ── */
+  .tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);
+    padding-bottom:0;overflow-x:auto;}
+  .tab-btn{background:transparent;border:none;border-bottom:2px solid transparent;
+    color:var(--text3);padding:10px 18px;font-family:'DM Sans',sans-serif;
+    font-size:13px;font-weight:500;cursor:pointer;transition:.2s;white-space:nowrap;
+    margin-bottom:-1px;}
+  .tab-btn.active{color:var(--accent2);border-bottom-color:var(--accent2);}
+  .tab-btn:hover:not(.active){color:var(--text2);}
+  .tab-panel{display:none;animation:fadeIn .25s ease;}
+  .tab-panel.active{display:block;}
+
+  /* ── SECTION GRID ── */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+
+  /* ── CARDS ── */
+  .sec-card{
+    background:var(--card);border:1px solid var(--border);
+    border-radius:var(--radius);padding:20px;
+  }
+  .sec-title{font-family:'Barlow Condensed',sans-serif;font-size:15px;
+    font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;
+    margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+  .sec-title::before{content:'';display:block;width:3px;height:14px;
+    background:var(--accent);border-radius:2px;}
+
+  /* ── DATA ROWS ── */
+  .data-row{display:flex;justify-content:space-between;align-items:flex-start;
+    padding:8px 0;border-bottom:1px solid var(--border);}
+  .data-row:last-child{border-bottom:none;}
+  .dr-key{font-size:12px;color:var(--text3);flex-shrink:0;width:145px;}
+  .dr-val{font-size:12px;color:var(--text);font-weight:500;text-align:right;
+    flex:1;word-break:break-word;}
+  .dr-val.accent{color:var(--accent2);}
+  .dr-val.gold{color:var(--gold2);}
+  .dr-val.teal{color:var(--teal2);}
+  .dr-val.rose{color:var(--rose2);}
+
+  /* ── PROGRESS BARS ── */
+  .prog-wrap{margin-bottom:10px;}
+  .prog-label{display:flex;justify-content:space-between;
+    font-size:11px;color:var(--text2);margin-bottom:4px;}
+  .prog-bar{height:6px;background:var(--bg);border-radius:99px;overflow:hidden;}
+  .prog-fill{height:100%;border-radius:99px;transition:width .6s ease;}
+
+  /* ── REGION TABLE ── */
+  .rtable{width:100%;border-collapse:collapse;font-size:12px;}
+  .rtable th{text-align:left;color:var(--text3);font-weight:600;
+    padding:8px 12px;border-bottom:2px solid var(--border);
+    text-transform:uppercase;font-size:10px;letter-spacing:.4px;}
+  .rtable td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text);}
+  .rtable tr:last-child td{border-bottom:none;}
+  .rtable tr:hover td{background:rgba(30,45,69,.5);}
+  .avail-bar{display:flex;align-items:center;gap:8px;}
+  .avail-dots{display:flex;gap:3px;}
+  .avail-dot{width:8px;height:8px;border-radius:50%;}
+
+  /* ── SHELF CHART WRAPPER ── */
+  .chart-wrap{position:relative;height:200px;}
+
+  /* ── MONTH GRID ── */
+  .month-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin-top:8px;}
+  .month-cell{border-radius:4px;height:28px;display:flex;align-items:center;
+    justify-content:center;font-size:9px;font-weight:600;
+    text-transform:uppercase;letter-spacing:.3px;transition:.2s;}
+  .month-active{background:var(--accent);color:#fff;}
+  .month-peak{background:var(--gold);color:#000;}
+  .month-inactive{background:var(--card2);color:var(--text3);}
+  .month-label{font-size:9px;color:var(--text3);text-align:center;margin-top:3px;
+    text-transform:uppercase;}
+
+  /* ── STAT CHIPS ── */
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+  .chip{background:var(--card2);border:1px solid var(--border);
+    border-radius:8px;padding:8px 14px;font-size:11px;}
+  .chip-val{font-family:'Barlow Condensed',sans-serif;font-size:18px;
+    font-weight:700;display:block;line-height:1;}
+  .chip-key{color:var(--text3);font-size:10px;margin-top:2px;}
+
+  /* ── BUYERS LIST ── */
+  .buyer-item{display:flex;align-items:center;gap:8px;padding:7px 0;
+    border-bottom:1px solid var(--border);}
+  .buyer-item:last-child{border-bottom:none;}
+  .buyer-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;}
+  .buyer-name{font-size:12px;color:var(--text);}
+
+  /* ── USES GRID ── */
+  .use-card{background:var(--card2);border:1px solid var(--border);
+    border-radius:10px;padding:14px;text-align:center;}
+  .use-icon{font-size:24px;margin-bottom:8px;}
+  .use-name{font-size:12px;font-weight:600;color:var(--text);}
+
+  /* ── PRICE TREND ── */
+  .price-chart-wrap{position:relative;height:180px;}
+
+  /* ── NOTES BOX ── */
+  .notes-box{background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);
+    border-radius:10px;padding:14px;font-size:12px;color:var(--text2);
+    line-height:1.6;margin-top:12px;}
+  .notes-box strong{color:var(--accent2);}
+
+  /* ── SUPPLIER ── */
+  .sup-card{background:var(--card2);border:1px solid var(--border);
+    border-radius:10px;padding:14px;margin-bottom:10px;}
+  .sup-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;}
+  .sup-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
+  .sup-tag{background:var(--bg);border:1px solid var(--border);border-radius:6px;
+    padding:2px 8px;font-size:10px;color:var(--text3);}
+
+  /* ── RELIABILITY ── */
+  .rel-stars{display:flex;gap:2px;}
+  .rel-star{font-size:12px;}
+
+  /* ── EMPTY ── */
+  .empty{text-align:center;padding:32px;color:var(--text3);font-size:13px;}
+
+  @media(max-width:900px){
+    .sidebar{width:220px;min-width:220px;}
+    .dh-kpis{grid-template-columns:repeat(2,1fr);}
+    .grid2,.grid3,.grid4{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-icon">🌾</div>
+    <div>
+      <div class="logo-text">AgriPowder Intelligence</div>
+      <div class="logo-sub">Dehydrated Vegetable Business Database</div>
+    </div>
+  </div>
+  <div class="header-stats">
+    <div class="hstat"><div class="hstat-val">25</div><div class="hstat-lbl">Products</div></div>
+    <div class="hstat"><div class="hstat-val">8</div><div class="hstat-lbl">Data Modules</div></div>
+    <div class="hstat"><div class="hstat-val">18</div><div class="hstat-lbl">Export SKUs</div></div>
+    <div class="hstat"><div class="hstat-val">12+</div><div class="hstat-lbl">States</div></div>
+  </div>
+</header>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-top">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search" id="searchInput" type="text" placeholder="Search product or ID…" oninput="filterProducts()"/>
+      </div>
+      <div class="cat-pills">
+        <button class="pill active" onclick="setCat('All',this)">All</button>
+        <button class="pill" onclick="setCat('Vegetable',this)">Vegetable</button>
+        <button class="pill" onclick="setCat('Herb',this)">Herb</button>
+        <button class="pill" onclick="setCat('Ayurvedic',this)">Ayurvedic</button>
+      </div>
+    </div>
+    <div class="sb-list" id="productList"></div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main" id="mainContent">
+
+    <!-- WELCOME -->
+    <div class="welcome" id="welcomeScreen">
+      <div class="welcome-icon">🌿</div>
+      <h2>Select a Product</h2>
+      <p>Click any product ID from the sidebar to view complete data — regions, pricing, processing, shelf life, market demand, and suppliers.</p>
+      <div class="quick-grid" id="quickGrid"></div>
+    </div>
+
+    <!-- DETAIL VIEW -->
+    <div class="detail" id="detailView">
+
+      <!-- HEADER -->
+      <div class="detail-header">
+        <div class="dh-bg"></div>
+        <div class="dh-icon" id="dh-icon">🧅</div>
+        <div class="dh-info">
+          <div class="dh-title" id="dh-title">Onion</div>
+          <div class="dh-sci" id="dh-sci">Allium cepa</div>
+          <div class="dh-tags" id="dh-tags"></div>
+        </div>
+        <div class="dh-kpis" id="dh-kpis"></div>
+      </div>
+
+      <!-- TABS -->
+      <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('overview',this)">📋 Overview</button>
+        <button class="tab-btn" onclick="showTab('season',this)">🌱 Seasonality</button>
+        <button class="tab-btn" onclick="showTab('region',this)">🗺 Regions</button>
+        <button class="tab-btn" onclick="showTab('price',this)">💰 Pricing</button>
+        <button class="tab-btn" onclick="showTab('process',this)">⚙ Processing</button>
+        <button class="tab-btn" onclick="showTab('storage',this)">📦 Storage</button>
+        <button class="tab-btn" onclick="showTab('market',this)">📈 Market</button>
+        <button class="tab-btn" onclick="showTab('supplier',this)">🤝 Suppliers</button>
+      </div>
+
+      <!-- TAB PANELS -->
+      <div id="tab-overview" class="tab-panel active"></div>
+      <div id="tab-season" class="tab-panel"></div>
+      <div id="tab-region" class="tab-panel"></div>
+      <div id="tab-price" class="tab-panel"></div>
+      <div id="tab-process" class="tab-panel"></div>
+      <div id="tab-storage" class="tab-panel"></div>
+      <div id="tab-market" class="tab-panel"></div>
+      <div id="tab-supplier" class="tab-panel"></div>
+    </div>
+  </main>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+// COMPLETE DATABASE — All 25 Products, All 8 Sheets
+// ═══════════════════════════════════════════════════════════════════════════
+const DB = {
+  1:{
+    icon:"🧅",name:"Onion",sci:"Allium cepa",cat:"Vegetable",sub:"Bulb",
+    powder:true,powderType:"Spray Dried / Hot Air Dried",difficulty:"Easy",
+    yield:"10–12%",ratio:"8–10 kg fresh : 1 kg powder",color:"Pale Yellow / Cream",
+    flavor:"Strong",nutrients:"Vitamin C, B6, Folate, Potassium, Quercetin, Sulfur compounds",
+    ayurvedic:"Digestive aid, anti-inflammatory, antimicrobial",
+    industrial:"Food processing, cosmetics, pharma, supplements",
+    demand:"High",export:true,grade:"A",
+    competitors:"Natureland Organics, Jain Farm Fresh, BCFoods, Olam",
+    notes:"Largest exported dehydrated vegetable from India. Nashik belt dominates. Year-round demand from global buyers. High seasonal price volatility — stock in Feb–Apr at low prices.",
+    cagr:9,cost:"₹80–120/kg",
+    season:{
+      cropType:"Annual / Biennial",sowing:"October – November",
+      harvestStart:"February",harvestEnd:"April",peak:"March",
+      duration:"120–150 days",type:"Rabi",annual:"Both (Kharif & Rabi)",
+      cycles:"1–2 per year",climate:"Semi-arid, well-drained sandy loam",
+      rainfall:"500–700 mm/year",temp:"13–35°C",yield:"8–12 tonnes/acre"
+    },
+    regions:[
+      {region:"Western",state:"Maharashtra",district:"Nashik / Pune / Solapur",belt:"Nashik-Pune Belt",vol:"7,000,000 MT/yr",peak:"Feb–Apr",logistics:"₹1500–2500/tonne",avail:10},
+      {region:"Western",state:"Gujarat",district:"Bhavnagar / Amreli",belt:"Saurashtra Belt",vol:"2,500,000 MT/yr",peak:"Jan–Mar",logistics:"₹1800–2800/tonne",avail:9},
+      {region:"Southern",state:"Karnataka",district:"Bellary / Dharwad",belt:"Bellary-Davangere Belt",vol:"1,200,000 MT/yr",peak:"Jan–Mar",logistics:"₹1600–2400/tonne",avail:8},
+      {region:"Central",state:"Madhya Pradesh",district:"Mandsaur / Ratlam",belt:"Malwa Plateau Belt",vol:"800,000 MT/yr",peak:"Feb–Apr",logistics:"₹2000–3000/tonne",avail:7},
+    ],
+    prices:{
+      months:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+      min:[8,10,12,10,15,18,20,16,12,10,8,7],
+      avg:[12,14,16,18,25,30,35,28,22,16,12,10],
+      max:[18,22,26,28,38,45,55,42,35,25,20,16],
+      markets:["Nashik APMC","Bhavnagar APMC"],volatility:8
+    },
+    process:{
+      method:"Hot Air Drying / Spray Drying",preProcess:"Peeling, slicing / dicing",
+      blanching:"No",dryTemp:"55–70°C",dryTime:"6–10 hours",
+      moisture:"≤5%",particleSize:"60–100 mesh",
+      costPerKg:"₹80–120",energy:"4.5–6.0 kWh/kg powder",
+      waste:"12–18%",byProducts:"Outer peel (organic fertilizer), onion juice"
+    },
+    storage:{
+      freshLife:"2–4 weeks",dehyLife:"12–18 months",powderLife:"18–24 months",
+      temp:"Cool, below 25°C",humidity:"<60% RH",
+      packaging:"HDPE bag / Laminated pouch / PP woven bag",
+      vacuum:"24–30 months",nitrogen:"30–36 months",
+      risks:"Moisture absorption, clumping, off-flavor development, color browning"
+    },
+    market:{
+      segment:"Food Processing / HoReCa / Export",
+      use:"Soups, sauces, snack seasoning, instant noodles, ready meals, spice blends",
+      retail:"High",bulk:"Very High",exportDemand:"Very High",cagr:"8–10% CAGR",
+      buyers:["MTR Foods","ITC Limited","Hindustan Unilever","Nestle India","Haldirams","Global importers — USA, EU, UAE, Japan"],
+      substitutes:"Fresh onion (limited shelf life), onion flakes",
+      seasonality:"Year-round; peak processed food buying Oct–Mar"
+    },
+    suppliers:[
+      {id:1,name:"Ravi Agro Farms",contact:"Ravi Kumar",phone:"98XXXXXXXX",state:"Maharashtra",district:"Nashik",size:"120 acres",moq:"5000 kg",reliability:8,terms:"30% advance, balance on delivery",note:"APMC Nashik registered; organic onion available"},
+      {id:15,name:"Nashik Veg Hub",contact:"Pravin Patil",phone:"97XXXXXXXX",state:"Maharashtra",district:"Nashik",size:"200 acres",moq:"5000 kg",reliability:9,terms:"15-day credit (established buyers)",note:"Cold storage facility on-site; one of Nashik's largest agri-traders"},
+      {id:16,name:"Gujarat FPO Collective",contact:"Bhavesh Shah",phone:"92XXXXXXXX",state:"Gujarat",district:"Mehsana",size:"500 acres (FPO)",moq:"10000 kg",reliability:9,terms:"Credit facility 30 days",note:"Large FPO; export-grade quality; cold storage"},
+    ]
+  },
+  2:{
+    icon:"🧄",name:"Garlic",sci:"Allium sativum",cat:"Vegetable",sub:"Bulb",
+    powder:true,powderType:"Air Dried / Spray Dried",difficulty:"Medium",
+    yield:"20–25%",ratio:"4–5 kg fresh : 1 kg powder",color:"Off-White / Cream",
+    flavor:"Strong",nutrients:"Allicin, Vitamin C, B6, Manganese, Selenium, Sulfur compounds",
+    ayurvedic:"Antibacterial, immunomodulator, cardiovascular health, anti-diabetic",
+    industrial:"Food / Pharma / Nutraceuticals / Supplements",
+    demand:"High",export:true,grade:"A",
+    competitors:"Jain Irrigation, McCormick, Olam, BCFoods",
+    notes:"High allicin retention is key quality differentiator. Avoid high-temp drying (>65°C destroys allicin). Mandsaur MP is India's largest garlic belt. Strong pharma demand for allicin capsules.",
+    cagr:10,cost:"₹100–150/kg",
+    season:{
+      cropType:"Annual",sowing:"October – November",harvestStart:"March",
+      harvestEnd:"May",peak:"April",duration:"130–180 days",type:"Rabi",
+      annual:"Seasonal",cycles:"1 per year",climate:"Cool dry climate, sandy loam",
+      rainfall:"600–750 mm",temp:"12–30°C",yield:"4–6 tonnes/acre"
+    },
+    regions:[
+      {region:"Western",state:"Gujarat",district:"Junagadh / Rajkot",belt:"Saurashtra Garlic Belt",vol:"1,200,000 MT/yr",peak:"Feb–Apr",logistics:"₹1500–2500/tonne",avail:9},
+      {region:"Central",state:"Madhya Pradesh",district:"Mandsaur / Ujjain",belt:"Malwa Belt",vol:"1,800,000 MT/yr",peak:"Feb–Apr",logistics:"₹1800–2800/tonne",avail:10},
+      {region:"Northern",state:"Uttar Pradesh",district:"Agra / Mathura",belt:"Yamuna Belt",vol:"400,000 MT/yr",peak:"Mar–Apr",logistics:"₹1500–2200/tonne",avail:7},
+    ],
+    prices:{
+      months:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+      min:[15,12,15,18,22,28,32,30,28,22,18,16],
+      avg:[20,17,22,28,36,42,48,45,40,30,24,20],
+      max:[30,25,32,45,55,62,70,65,58,45,35,28],
+      markets:["Mandsaur APMC","Gondal APMC"],volatility:7
+    },
+    process:{
+      method:"Hot Air Drying",preProcess:"Peeling, slicing / granulating",
+      blanching:"No",dryTemp:"55–65°C",dryTime:"8–12 hours",
+      moisture:"≤5%",particleSize:"60–100 mesh",
+      costPerKg:"₹100–150",energy:"5.0–7.0 kWh/kg",
+      waste:"10–15%",byProducts:"Garlic peel (antioxidant extract)"
+    },
+    storage:{
+      freshLife:"1–3 months",dehyLife:"12–18 months",powderLife:"18–24 months",
+      temp:"Cool, below 25°C",humidity:"<55% RH",
+      packaging:"HDPE bag / Kraft laminate / Tin",
+      vacuum:"24–30 months",nitrogen:"30–36 months",
+      risks:"Moisture absorption, oxidation, allicin degradation above 25°C"
+    },
+    market:{
+      segment:"Food Processing / Pharma / Nutraceuticals",
+      use:"Seasoning blends, health supplements, garlic sauce, marinades, pharma capsules, bakery",
+      retail:"High",bulk:"Very High",exportDemand:"Very High",cagr:"9–11% CAGR",
+      buyers:["McCormick","Olam International","Pharma companies","Supplement brands","ITC","HUL"],
+      substitutes:"Fresh garlic, garlic extract, garlic oil",
+      seasonality:"Year-round; pharma buying Jan–Jun; food industry year-round"
+    },
+    suppliers:[
+      {id:2,name:"Gujarat Garlic Traders",contact:"Suresh Patel",phone:"99XXXXXXXX",state:"Gujarat",district:"Junagadh",size:"80 acres",moq:"3000 kg",reliability:8,terms:"50% advance",note:"Major garlic belt; export-grade available"},
+      {id:3,name:"Malwa Spice Producers",contact:"Ramesh Verma",phone:"94XXXXXXXX",state:"Madhya Pradesh",district:"Mandsaur",size:"200 acres",moq:"5000 kg",reliability:9,terms:"30–60 days credit",note:"MP's largest garlic trading zone; direct farmer contact"},
+      {id:16,name:"Gujarat FPO Collective",contact:"Bhavesh Shah",phone:"92XXXXXXXX",state:"Gujarat",district:"Mehsana",size:"500 acres (FPO)",moq:"10000 kg",reliability:9,terms:"30-day credit",note:"Large FPO; consistent volumes; export-grade quality"},
+    ]
+  },
+  3:{
+    icon:"🍅",name:"Tomato",sci:"Solanum lycopersicum",cat:"Vegetable",sub:"Fruit",
+    powder:true,powderType:"Spray Dried",difficulty:"Medium",
+    yield:"6–8%",ratio:"13–15 kg fresh : 1 kg powder",color:"Deep Red / Brick Red",
+    flavor:"Medium",nutrients:"Lycopene, Vitamin C, A, K, Potassium, Folate, Antioxidants",
+    ayurvedic:"Antioxidant, anti-cancer properties, heart health, skin health",
+    industrial:"Food processing / Cosmetics / Pharma",
+    demand:"High",export:true,grade:"A",
+    competitors:"Kagome, Conagra, Jain Farm Fresh",
+    notes:"High lycopene content is primary marketing point. Spray drying preferred — preserves lycopene. Nashik and Kolar Karnataka are top sourcing belts. Large ratio (13-15:1) means sourcing management critical.",
+    cagr:9,cost:"₹120–180/kg",
+    season:{
+      cropType:"Annual",sowing:"Jun–Jul (Kharif) / Nov–Dec (Rabi)",harvestStart:"September",
+      harvestEnd:"March",peak:"October–February",duration:"60–90 days",type:"Both",
+      annual:"Seasonal",cycles:"2–3 per year",climate:"Warm humid, well-drained soil",
+      rainfall:"750–1200 mm",temp:"15–30°C",yield:"8–12 tonnes/acre"
+    },
+    regions:[
+      {region:"Western",state:"Maharashtra",district:"Nashik / Satara",belt:"Nashik-Satara Belt",vol:"3,000,000 MT/yr",peak:"Oct–Jan",logistics:"₹1200–2200/tonne",avail:9},
+      {region:"Southern",state:"Karnataka",district:"Kolar / Chikkaballapur",belt:"Kolar Belt",vol:"2,500,000 MT/yr",peak:"Oct–Dec",logistics:"₹1400–2400/tonne",avail:9},
+      {region:"Southern",state:"Andhra Pradesh",district:"Kurnool / Chittoor",belt:"Chittoor-Kurnool Belt",vol:"2,000,000 MT/yr",peak:"Nov–Jan",logistics:"₹1500–2500/tonne",avail:8},
+    ],
+    prices:{
+      months:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+      min:[8,10,12,14,18,22,18,15,10,5,6,7],
+      avg:[14,16,18,22,28,32,25,20,15,10,9,10],
+      max:[22,25,28,35,45,48,40,32,22,15,14,16],
+      markets:["Nashik APMC","Kolar APMC","Kurnool APMC"],volatility:8
+    },
+    process:{
+      method:"Spray Drying",preProcess:"Washing, cutting, pulping, screening",
+      blanching:"No",dryTemp:"Inlet 170–180°C / Outlet 80–90°C",dryTime:"3–5 hours",
+      moisture:"≤4%",particleSize:"80–100 mesh",
+      costPerKg:"₹120–180",energy:"6.0–8.0 kWh/kg",
+      waste:"15–20%",byProducts:"Tomato skin & seeds (lycopene extract, seed oil)"
+    },
+    storage:{
+      freshLife:"5–10 days",dehyLife:"12–18 months",powderLife:"18–24 months",
+      temp:"Cool, below 20°C",humidity:"<50% RH",
+      packaging:"Laminated foil pouch / Tin",
+      vacuum:"24–30 months",nitrogen:"30–36 months",
+      risks:"Lycopene oxidation, color fading (browning), Maillard reaction, moisture"
+    },
+    market:{
+      segment:"Food Processing / HoReCa / Exports",
+      use:"Ketchup, tomato soup, pizza sauce, ready meals, pasta sauce, instant mixes",
+      retail:"High",bulk:"Very High",exportDemand:"High",cagr:"8–10% CAGR",
+      buyers:["Nestle","Hindustan Unilever","ITC","Kagome Japan","Conagra USA","Del Monte"],
+      substitutes:"Tomato paste, puree (shorter shelf life)",
+      seasonality:"Year-round; peak buying Sep–Feb (harvest low-price window)"
+    },
+    suppliers:[
+      {id:1,name:"Ravi Agro Farms",contact:"Ravi Kumar",phone:"98XXXXXXXX",state:"Maharashtra",district:"Nashik",size:"120 acres",moq:"3000 kg",reliability:8,terms:"30% advance",note:"Nashik belt; tomato + onion dual crop"},
+      {id:6,name:"Karnataka Tomato Growers",contact:"Manjunath Reddy",phone:"96XXXXXXXX",state:"Karnataka",district:"Kolar",size:"90 acres",moq:"3000 kg",reliability:8,terms:"15-day credit",note:"Kolar belt — India's leading tomato hub"},
+      {id:18,name:"Odisha Veggie Collective",contact:"Bijay Patra",phone:"94XXXXXXXX",state:"Odisha",district:"Cuttack",size:"180 acres (FPO)",moq:"3000 kg",reliability:7,terms:"Cash on delivery",note:"Eastern India emerging supply hub"},
+    ]
+  },
+  4:{
+    icon:"🥔",name:"Potato",sci:"Solanum tuberosum",cat:"Vegetable",sub:"Tuber",
+    powder:true,powderType:"Drum Dried / Spray Dried",difficulty:"Easy",
+    yield:"15–20%",ratio:"5–7 kg fresh : 1 kg powder",color:"Cream / Off-White",
+    flavor:"Low",nutrients:"Carbohydrates, Potassium, Vitamin C, B6, Iron, Manganese",
+    ayurvedic:"Energy, digestive health, anti-ulcer",
+    industrial:"Food / Snacks / Pharma / Baby food",
+    demand:"High",export:true,grade:"A",
+    competitors:"McCain, PepsiCo, Emsland Group, Lamb Weston, Aviko",
+    notes:"Huge volume commodity product. UP is India's potato capital. Used in instant mash, snack coatings, soups, baby food. Drum drying most common; very cost-effective. Low price volatility compared to other vegetables.",
+    cagr:8,cost:"₹80–120/kg",
+    season:{
+      cropType:"Annual",sowing:"October – November",harvestStart:"January",
+      harvestEnd:"March",peak:"February",duration:"75–120 days",type:"Rabi",
+      annual:"Seasonal",cycles:"1–2 per year",climate:"Cool climate, loamy well-drained",
+      rainfall:"600–900 mm",temp:"15–25°C",yield:"6–10 tonnes/acre"
+    },
+    regions:[
+      {region:"Northern",state:"Uttar Pradesh",district:"Agra / Farrukhabad",belt:"UP Potato Belt",vol:"15,000,000 MT/yr",peak:"Jan–Mar",logistics:"₹1000–2000/tonne",avail:10},
+      {region:"Eastern",state:"West Bengal",district:"Hooghly / Hugli",belt:"Gangetic Plain",vol:"5,000,000 MT/yr",peak:"Dec–Mar",logistics:"₹1200–2200/tonne",avail:9},
+      {region:"Western",state:"Gujarat",district:"Disa / Mehsana",belt:"North Gujarat Belt",vol:"2,500,000 MT/yr",peak:"Dec–Feb",logistics:"₹1200–2000/tonne",avail:8},
+    ],
+    prices:{
+      months:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+      min:[5,4,5,6,7,8,10,11,12,10,8,6],
+      avg:[7,6,7,8,10,11,13,14,14,12,10,8],
+      max:[10,9,10,12,14,16,18,18,18,16,14,12],
+      markets:["Agra APMC","Hooghly APMC"],volatility:4
+    },
+    process:{
+      method:"Drum Drying / Spray Drying",preProcess:"Washing, peeling, cooking, mashing",
+      blanching:"No",dryTemp:"140–180°C (drum surface)",dryTime:"0.5–1 hour",
+      moisture:"≤8%",particleSize:"80–120 mesh",
+      costPerKg:"₹80–120",energy:"3.5–5.0 kWh/kg",
+      waste:"10–15%",byProducts:"Potato peel (starch extraction, animal feed)"
+    },
+    storage:{
+      freshLife:"2–4 months (cold storage)",dehyLife:"18–24 months",powderLife:"24–36 months",
+      temp:"10–15°C cool storage",humidity:"<60% RH",
+      packaging:"Multi-layer LDPE / PP bag",
+      vacuum:"30–36 months",nitrogen:"36–42 months",
+      risks:"Moisture reabsorption, enzymatic browning, rancidity of starch"
+    },
+    market:{
+      segment:"Food Processing / Snacks / HoReCa",
+      use:"Instant mashed potato, chips/crisps base, soup thickener, baby food, ready meals",
+      retail:"High",bulk:"Very High",exportDemand:"High",cagr:"7–9% CAGR",
+      buyers:["PepsiCo","McCain Foods","Balaji Wafers","ITC","Parle Products","Baby food brands"],
+      substitutes:"Fresh potato (local use), sweet potato powder",
+      seasonality:"Year-round; peak processing Dec–Apr"
+    },
+    suppliers:[
+      {id:4,name:"UP Potato Collective",contact:"Anil Singh",phone:"90XXXXXXXX",state:"Uttar Pradesh",district:"Agra",size:"300 acres (FPO)",moq:"10000 kg",reliability:8,terms:"Cash/7-day credit",note:"FPO collective; 40+ farmers; consistent volume"},
+      {id:5,name:"Bengal Fresh Produce",contact:"Debasis Ghosh",phone:"98XXXXXXXX",state:"West Bengal",district:"Hooghly",size:"150 acres",moq:"5000 kg",reliability:7,terms:"Cash on delivery",note:"Connects to Kolkata cold chain"},
+    ]
+  },
+  5:{
+    icon:"🥬",name:"Spinach",sci:"Spinacia oleracea",cat:"Vegetable",sub:"Leaf",
+    powder:true,powderType:"Air Dried / Freeze Dried",difficulty:"Medium",
+    yield:"7–10%",ratio:"10–14 kg fresh : 1 kg powder",color:"Dark Green",
+    flavor:"Medium",nutrients:"Iron, Folate, Vitamin K, A, C, Magnesium, Lutein, Zeaxanthin",
+    ayurvedic:"Blood purifier, eye health, hemoglobin boost, anti-anemia",
+    industrial:"Food / Nutraceuticals / Cosmetics / Baby food",
+    demand:"High",export:true,grade:"A",
+    competitors:"KOYAH, Naturevibe Botanicals, Organic India",
+    notes:"Blanching (2–3 min at 80°C) essential before drying to retain color and nutrients. Freeze-dried version commands 3x premium. Strong baby food and green smoothie segment demand globally.",
+    cagr:11,cost:"₹120–200/kg",
+    season:{
+      cropType:"Annual",sowing:"September–October / February–March",harvestStart:"November",
+      harvestEnd:"May",peak:"December–February",duration:"35–45 days",type:"Rabi/Zaid",
+      annual:"Seasonal",cycles:"3–4 per year",climate:"Cool, moist; well-drained soil",
+      rainfall:"400–600 mm",temp:"10–25°C",yield:"3–5 tonnes/acre"
+    },
+    regions:[
+      {region:"Northern",state:"Uttar Pradesh",district:"Lucknow / Kanpur",belt:"Gangetic Plain",vol:"500,000 MT/yr",peak:"Nov–Feb",logistics:"₹1200–2000/tonne",avail:8},
+      {region:"Western",state:"Maharashtra",district:"Pune / Nashik",belt:"Deccan Plateau",vol:"300,000 MT/yr",peak:"Nov–Feb",logistics:"₹1000–1800/tonne",avail:7},
+    ],
+    prices:{
+      months:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+      min:[5,7,9,11,13,14,12,10,8,5,4,5],
+      avg:[8,11,14,16,18,20,18,15,12,8,6,7],
+      max:[14,18,20,24,28,30,26,22,18,14,10,12],
+      markets:["Lucknow APMC","Pune APMC"],volatility:6
+    },
+    process:{
+      method:"Hot Air Drying / Freeze Drying",preProcess:"Washing, sorting, wilting",
+      blanching:"Yes — 2–3 min at 80°C",dryTemp:"50–60°C (AD) / -40°C (FD)",dryTime:"6–10 hours",
+      moisture:"≤5%",particleSize:"80–100 mesh",
+      costPerKg:"₹120–200",energy:"5.5–7.5 kWh/kg (AD)",
+      waste:"15–25%",byProducts:"Blanch water (mineral-rich, use for liquid fertilizer)"
+    },
+    storage:{
+      freshLife:"3–7 days",dehyLife:"12–18 months",powderLife:"18–24 months",
+      temp:"Below 20°C",humidity:"<50% RH",
+      packaging:"Laminated foil pouch / HDPE with desiccant",
+      vacuum:"24–30 months",nitrogen:"30–36 months",
+      risks:"Chlorophyll degradation (color yellowing), lipid oxidation, vitamin loss"
+    },
+    market:{
+      segment:"Health Food / Nutraceuticals / Baby Food",
+      use:"Green smoothie powder, baby food, protein powder blending, pasta coloring, green juices",
+      retail:"High",bulk:"High",exportDemand:"High",cagr:"10–12% CAGR",
+      buyers:["Health food brands","Nestle (baby food)","HiPP","Herbalife","Organic food exporters"],
+      substitutes:"Kale powder, moringa powder, wheatgrass powder",
+      seasonality:"Year-round; peak retail Oct–Mar"
+    },
+    suppliers:[
+      {id:7,name:"Haryana Greenfields",contact:"Sunil Hooda",phone:"95XXXXXXXX",state:"Haryana",district:"Karnal",size:"110 acres",moq:"2000 kg",reliability:7,terms:"Cash/advance",note:"Multi-vegetable; NCR proximity — fast logistics"},
+      {id:14,name:"UP Herbal Collectif",contact:"Ranjit Kumar",phone:"91XXXXXXXX",state:"Uttar Pradesh",district:"Barabanki",size:"250 acres (FPO)",moq:"2000 kg",reliability:8,terms:"30-day credit",note:"FPO with AYUSH Board registration"},
+    ]
+  },
+  6:{
+    icon:"🥕",name:"Carrot",sci:"Daucus carota",cat:"Vegetable",sub:"Root",
+    powder:true,powderType:"Air Dried / Spray Dried",difficulty:"Easy",
+    yield:"10–13%",ratio:"8–10 kg fresh : 1 kg powder",color:"Orange",
+    flavor:"Medium",nutrients:"Beta-Carotene (Vitamin A precursor), Vitamin K1, B6, Potassium, Biotin",
+    ayurvedic:"Eye health, skin health, antioxidant, liver detox",
+    industrial:"Food / Cosmetics / Baby food / Nutraceuticals",
+    demand:"Medium",export:true,grade:"A",
+    competitors:"Olam, Sensient Technologies, Nutraceutix",
+    notes:"High beta-carotene content is key premium marker. Blanching (3–5 min at 90°C) needed to preserve color. Strong demand in infant/baby food globally. Carrot + apple combo powder growing in European markets.",
+    cagr:9,cost:"₹80–130/kg",
+    season:{
+      cropType:"Annual",sowing:"Aug–Sep (Kharif) / Oct–Nov (Rabi)",harvestStart:"October",
+      harvestEnd:"January",peak:"December",duration:"80–100 days",type:"Both",
+      annual:"Seasonal",cycles:"2 per year",climate:"Cool; deep loamy soil",
+      rainfall:"600–800 mm",temp:"8–28°C",yield:"6–10 tonnes/acre"
+    },
+    regions:[
+      {region:"Northern",state:"Uttar Pradesh",district:"Mathura / Aligarh",belt:"North India Plains",vol:"1,200,000 MT/yr",peak:"Oct–Feb",logistics:"₹1200–2000/tonne",avail:9},
+      {region:"Southern",state:"Karnataka",district:"Hassan / Mysore",belt:"South Karnataka Belt",vol:"800,000 MT/yr",peak:"Oct–Jan",logistics:"₹1400–2200/tonne",avail:8},
+    ],
+    prices:{
+      months:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+      min:[6,8,10,12,14,16,15,12,8,5,5,6],
+      avg:[10,12,16,18,20,22,20,18,14,10,8,9],
+      max:[16,18,24,28,32,35,30,26,20,14,12,14],
+      markets:["Agra APMC","Mysore APMC"],volatility:5
+    },
+    process:{
+      method:"Hot Air Drying / Spray Drying",preProcess:"Washing, peeling, slicing",
+      blanching:"Yes — 3–5 min at 90°C",dryTemp:"55–65°C",dryTime:"6–8 hours",
+      moisture:"≤5%",particleSize:"60–100 mesh",
+      costPerKg:"₹80–130",energy:"4.5–6.5 kWh/kg",
+      waste:"12–18%",byProducts:"Carrot peel, press cake (animal feed)"
+    },
+    storage:{
+      freshLife:"3–4 weeks",dehyLife:"12–18 months",powderLife:"18–24 months",
+      temp:"Below 25°C",humidity:"<55% RH",
+      packaging:"HDPE / Kraft laminate",
+      vacuum:"24–30 months",nitrogen:"30–36 months",
+      risks:"Beta-carotene oxidation, color fade (orange to brown), moisture clumping"
+    },
+    market:{
+      segment:"Food Processing / Baby Food / Nutraceuticals",
+      use:"Baby food, soup mixes, health smoothie powders, bakery coloring, confectionery",
+      retail:"Medium",bulk:"High",exportDemand:"High",cagr:"8–10% CAGR",
+      buyers:["Nestle (Cerelac)","Heinz","Haldirams","Nutraceutical companies","European baby food brands"],
+      substitutes:"Pumpkin powder, sweet potato powder",
+      seasonality:"Year-round; peak buying Sep–Feb"
+    },
+    suppliers:[
+      {id:7,name:"Haryana Greenfields",contact:"Sunil Hooda",phone:"95XXXXXXXX",state:"Haryana",district:"Karnal",size:"110 acres",moq:"2000 kg",reliability:7,terms:"Cash/advance",note:"Carrot + beetroot + spinach combined supply"},
+    ]
+  },
+  7:{
+    icon:"🫙",name:"Beetroot",sci:"Beta vulgaris",cat:"Vegetable",sub:"Root",
+    powder:true,powderType:"Spray Dried",difficulty:"Medium",
+    yield:"8–12%",ratio:"9–12 kg fresh : 1 kg powder",color:"Deep Magenta / Purple-Red",
+    flavor:"Medium",nutrients:"Nitrates, Betalains (pigment), Folate, Manganese, Iron, Vitamin C",
+    ayurvedic:"Blood purifier, liver detox, stamina, blood pressure management",
+    industrial:"Food / Sports Nutrition / Cosmetics / Natural dyes",
+    demand:"High",export:true,grade:"A",
+    competitors:"Bioglan, Optimus Nutraceuticals, Alovitox",
+    notes:"Betalain pigment is heat/light sensitive — spray drying preferred. Growing sports nutrition and pre-workout segment. EU and UK are top export markets. Premium natural red colorant for food industry.",
+    cagr:13,cost:"₹180–280/kg",
+    season:{
+      cropType:"Annual",sowing:"Jun–Jul / Oct–Nov",harvestStart:"September",
+      harvestEnd:"January",peak:"November",duration:"60–90 days",type:"Both",
+      annual:"Seasonal",cycles:"2 per year",climate:"Cool moist; deep sandy loam",
+      rainfall:"600–800 mm",temp:"10–25°C",yield:"5–8 tonnes/acre"
+    },
+    regions:[
+      {region:"Northern",state:"Haryana",district:"Karnal / Panipat",belt:"Haryana Plains",vol:"300,000 MT/yr",peak:"Nov–Feb",logistics:"₹1500–2500/tonne",avail:7},
+      {region:"Western",state:"Maharashtra",district:"Pune / Nashik",belt:"Deccan Plateau",vol:"200,000 MT/yr",peak:"Nov–Feb",logistics:"₹1200–2000/tonne",avail:7},
+    ],
+    prices:{
+      months:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+      min:[6,8,10,12,14,15,13,10,8,6,5,6],
+      avg:[10,12,16,18,20,22,19,16,14,10,8,9],
+      max:[16,18,24,28,30,32,28,24,20,15,12,14],
+      markets:["Karnal APMC","Pune APMC"],volatility:5
+    },
+    process:{
+      method:"Spray Drying",preProcess:"Washing, peeling, juicing/pureeing",
+      blanching:"No",dryTemp:"Inlet 160–170°C (spray dry)",dryTime:"2–3 hours",
+      moisture:"≤4%",particleSize:"80–100 mesh",
+      costPerKg:"₹180–280",energy:"6.5–8.5 kWh/kg",
+      waste:"15–20%",byProducts:"Pulp/pomace (dietary fibre supplement)"
+    },
+    storage:{
+      freshLife:"2–3 weeks",dehyLife:"12–18 months",powderLife:"18–24 months",
+      temp:"Below 20°C — light sensitive",humidity:"<50% RH",
+      packaging:"Laminated foil / Tin (opaque — avoid light)",
+      vacuum:"24–30 months",nitrogen:"30–36 months",
+      risks:"Betalain degradation from heat AND light, color fade, moisture caking"
+    },
+    market:{
+      segment:"Sports Nutrition / Health Food / Cosmetics",
+      use:"Pre-workout supplements, natural food colorant, health shots, smoothie powder, cosmetics",
+      retail:"High",bulk:"High",exportDemand:"Very High",cagr:"12–15% CAGR",
+      buyers:["GNC","Herbalife","Bulk Powders (UK)","Food colorant companies","EU organic brands"],
+      substitutes:"Acai powder, pomegranate powder, red spinach extract",
+      seasonality:"Year-round; strong export to UK, EU, USA"
+    },
+    suppliers:[
+      {id:7,name:"Haryana Greenfields",contact:"Sunil Hooda",phone:"95XXXXXXXX",state:"Haryana",district:"Karnal",size:"110 acres",moq:"2000 kg",reliability:7,terms:"Cash/advance",note:"Beetroot + carrot + spinach farm"},
+    ]
+  },
+  12:{
+    icon:"🫚",name:"Ginger",sci:"Zingiber officinale",cat:"Herb",sub:"Root",
+    powder:true,powderType:"Air Dried / Spray Dried",difficulty:"Medium",
+    yield:"15–20%",ratio:"5–7 kg fresh : 1 kg powder",color:"Light Yellow / Tan",
+    flavor:"Strong",nutrients:"Gingerols, Shogaols, Vitamin C, Magnesium, Potassium, B6",
+    ayurvedic:"Anti-nausea, digestive, anti-inflammatory, analgesic, thermogenic",
+    industrial:"Food / Pharma / Ayurveda / Cosmetics / Beverages",
+    demand:"High",export:true,grade:"A",
+    competitors:"Naturevibe, Organic India, Jain Farm Fresh, Starwest Botanicals",
+    notes:"Ginger powder huge in bakery, pharma and functional beverages. Gingerol retention depends on temperature control — max 65°C. Kerala Wayanad belt produces premium organic ginger. High value pharma ingredient.",
+    cagr:10,cost:"₹100–160/kg",
+    season:{
+      cropType:"Annual (treated as perennial)",sowing:"April – May",harvestStart:"October",
+      harvestEnd:"January",peak:"November–December",duration:"180–240 days",type:"Kharif",
+      annual:"Seasonal",cycles:"1 per year",climate:"Warm humid; well-drained loam",
+      rainfall:"1500–3000 mm",temp:"20–35°C",yield:"3–5 tonnes/acre (dry)"
+    },
+    regions:[
+      {region:"Southern",state:"Kerala",district:"Wayanad / Idukki",belt:"Western Ghats Belt",vol:"700,000 MT/yr",peak:"Oct–Jan",logistics:"₹1500–2500/tonne",avail:9},
+      {region:"Northern",state:"Himachal Pradesh",district:"Solan / Kangra",belt:"Himachal Belt",vol:"200,000 MT/yr",peak:"Sep–Nov",logistics:"₹2000–3000/tonne",avail:7},
+      {region:"Eastern",state:"Meghalaya",district:"East Khasi Hills",belt:"North-East Belt",vol:"150,000 MT/yr",peak:"Oct–Dec",logistics:"₹3000–4000/tonne",avail:6},
+    ],
+    prices:{
+      months:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+      min:[30,32,35,38,42,48,52,50,40,25,20,24],
+      avg:[38,42,45,50,55,60,65,58,50,38,28,32],
+      max:[55,60,65,72,80,90,95,85,72,55,42,48],
+      markets:["Kalpetta APMC","Siliguri APMC"],volatility:7
+    },
+    process:{
+      method:"Hot Air Drying",preProcess:"Washing, peeling, slicing thin",
+      blanching:"No",dryTemp:"55–65°C",dryTime:"8–14 hours",
+      moisture:"≤10%",particleSize:"60–80 mesh",
+      costPerKg:"₹100–160",energy:"5.0–7.0 kWh/kg",
+      waste:"12–18%",byProducts:"Ginger peel (essential oil, extract)"
+    },
+    storage:{
+      freshLife:"3–4 weeks",dehyLife:"18–24 months",powderLife:"24–30 months",
+      temp:"Below 20°C",humidity:"<55% RH",
+      packaging:"HDPE / Kraft laminate",
+      vacuum:"24–30 months",nitrogen:"30–36 months",
+      risks:"Gingerol/shogaol degradation, essential oil loss, moisture absorption"
+    },
+    market:{
+      segment:"Food Processing / Pharma / Ayurveda",
+      use:"Bakery spice, chai premix, pharma capsules (anti-nausea), functional beverages, health supplements",
+      retail:"High",bulk:"Very High",exportDemand:"High",cagr:"9–12% CAGR",
+      buyers:["HUL (ginger tea)","ITC","Tea companies","Pharma manufacturers","Export buyers USA/EU"],
+      substitutes:"Ginger extract, fresh ginger (limited shelf life)",
+      seasonality:"Year-round; peak procurement Nov–Mar (post-harvest low prices)"
+    },
+    suppliers:[
+      {id:9,name:"Kerala Spice Growers",contact:"Thomas Mathew",phone:"94XXXXXXXX",state:"Kerala",district:"Wayanad",size:"60 acres",moq:"2000 kg",reliability:9,terms:"Cash on delivery",note:"Wayanad premium ginger; organic certification available"},
+      {id:15,name:"Nashik Veg Hub",contact:"Pravin Patil",phone:"97XXXXXXXX",state:"Maharashtra",district:"Nashik",size:"200 acres",moq:"5000 kg",reliability:9,terms:"15-day credit",note:"Multi-crop hub; ginger procurement available"},
+    ]
+  },
+  13:{
+    icon:"🟡",name:"Turmeric",sci:"Curcuma longa",cat:"Herb",sub:"Root",
+    powder:true,powderType:"Air Dried",difficulty:"Easy",
+    yield:"20–25%",ratio:"4–5 kg fresh : 1 kg powder",color:"Deep Yellow / Golden",
+    flavor:"Strong",nutrients:"Curcumin (3–5%), Manganese, Iron, Vitamin B6, Potassium, Fiber",
+    ayurvedic:"Anti-inflammatory, antimicrobial, wound healing, liver detox, skin health",
+    industrial:"Food / Pharma / Ayurveda / Cosmetics / Natural dye",
+    demand:"V.High",export:true,grade:"A",
+    competitors:"Organic India, MDH, McCormick, Dabur, Everest Spices",
+    notes:"World turmeric capital is Erode, Tamil Nadu. Curcumin % is key quality marker (higher = more premium). Boiling rhizomes before drying reduces enzyme activity. Global demand surging due to 'golden milk' health trend in West.",
+    cagr:11,cost:"₹80–130/kg",
+    season:{
+      cropType:"Annual",sowing:"May – June",harvestStart:"November",
+      harvestEnd:"January",peak:"December",duration:"240–300 days",type:"Kharif",
+      annual:"Seasonal",cycles:"1 per year",climate:"Warm humid; well-drained clay loam",
+      rainfall:"1500–2250 mm",temp:"20–35°C",yield:"3–5 tonnes/acre (dry)"
+    },
+    regions:[
+      {region:"Southern",state:"Tamil Nadu",district:"Erode / Salem",belt:"Erode Turmeric Belt",vol:"500,000 MT/yr",peak:"Nov–Jan",logistics:"₹1000–1800/tonne",avail:10},
+      {region:"Southern",state:"Andhra Pradesh",district:"Nizamabad / Warangal",belt:"Telangana Belt",vol:"400,000 MT/yr",peak:"Dec–Feb",logistics:"₹1200–2200/tonne",avail:9},
+      {region:"Western",state:"Maharashtra",district:"Sangli / Satara",belt:"Sangli Belt",vol:"200,000 MT/yr",peak:"Jan–Mar",logistics:"₹1000–1800/tonne",avail:8},
+    ],
+    prices:{
+      months:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+      min:[55,58,62,65,68,70,72,70,68,60,50,52],
+      avg:[70,75,80,85,90,95,98,92,88,80,68,70],
+      max:[90,95,100,108,115,122,125,118,112,100,88,90],
+      markets:["Erode APMC","Nizamabad APMC"],volatility:6
+    },
+    process:{
+      method:"Hot Air Drying (after boiling)",preProcess:"Washing, boiling 30 min, peeling, slicing",
+      blanching:"No (boiling replaces blanching)",dryTemp:"55–65°C",dryTime:"8–14 hours",
+      moisture:"≤10%",particleSize:"60–80 mesh",
+      costPerKg:"₹80–130",energy:"4.5–6.5 kWh/kg",
+      waste:"10–15%",byProducts:"Boiling water (residual curcumin extract)"
+    },
+    storage:{
+      freshLife:"2–4 months (root)",dehyLife:"24–36 months",powderLife:"24–36 months",
+      temp:"Below 25°C — light sensitive",humidity:"<60% RH",
+      packaging:"HDPE bag / PP woven / Laminate (opaque)",
+      vacuum:"36–48 months",nitrogen:"48–60 months",
+      risks:"Curcumin degradation under light exposure, moisture caking"
+    },
+    market:{
+      segment:"Food Processing / Pharma / Cosmetics / Ayurveda",
+      use:"Curry powder, golden milk, anti-inflammatory supplements, cosmetic formulations, natural food color",
+      retail:"Very High",bulk:"Very High",exportDemand:"Very High",cagr:"10–13% CAGR",
+      buyers:["MDH Spices","Everest","McCormick USA","Dabur","Pharma companies","Cosmetic brands","EU organic importers"],
+      substitutes:"Curcumin extract (higher purity)",
+      seasonality:"Year-round; global demand growing strongly post-2020 health trend"
+    },
+    suppliers:[
+      {id:10,name:"Erode Turmeric Traders",contact:"Selvam R",phone:"93XXXXXXXX",state:"Tamil Nadu",district:"Erode",size:"200 acres",moq:"3000 kg",reliability:10,terms:"25% advance booking",note:"World turmeric capital; Salem & Alleppey grades available"},
+    ]
+  },
+  16:{
+    icon:"🌿",name:"Moringa",sci:"Moringa oleifera",cat:"Ayurvedic",sub:"Leaf",
+    powder:true,powderType:"Air Dried / Spray Dried",difficulty:"Easy",
+    yield:"10–15%",ratio:"7–10 kg fresh : 1 kg powder",color:"Dark Green",
+    flavor:"Medium",nutrients:"Protein (27%), Vitamin A, C, Iron, Calcium, Potassium, All essential amino acids",
+    ayurvedic:"Immunomodulator, anti-diabetic, energy booster, anti-inflammatory, malnutrition",
+    industrial:"Food / Nutraceuticals / Cosmetics / Pharma / Animal feed",
+    demand:"V.High",export:true,grade:"A",
+    competitors:"Organic India, KOYAH, Naturevibe Botanicals, Zen Principles",
+    notes:"Global superfood trend pushing exports massively. Tamil Nadu dominates India supply. Year-round availability is a huge advantage. Low drying temperature (<55°C) critical to preserve nutrients. Fastest-growing Ayurvedic export from India.",
+    cagr:16,cost:"₹120–180/kg",
+    season:{
+      cropType:"Perennial",sowing:"Feb–Mar (seedling establishment)",harvestStart:"Year-round",
+      harvestEnd:"Year-round",peak:"October–November",duration:"180+ days (first harvest)",type:"Year-round",
+      annual:"Annual",cycles:"3–4 leaf flushes/year",climate:"Warm semi-arid; well-drained",
+      rainfall:"400–600 mm",temp:"25–40°C",yield:"4–6 tonnes leaves/acre/year"
+    },
+    regions:[
+      {region:"Southern",state:"Tamil Nadu",district:"Salem / Dharmapuri",belt:"Tamil Nadu Plains",vol:"600,000 MT/yr",peak:"Year-round",logistics:"₹800–1500/tonne",avail:10},
+      {region:"Southern",state:"Andhra Pradesh",district:"Anantapur / Prakasam",belt:"Rayalaseema Belt",vol:"300,000 MT/yr",peak:"Year-round",logistics:"₹1000–1800/tonne",avail:8},
+    ],
+    prices:{
+      months:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+      min:[8,8,9,9,10,11,12,12,11,10,8,8],
+      avg:[12,12,13,13,14,15,16,16,15,14,12,12],
+      max:[18,18,20,20,22,24,26,25,22,20,18,18],
+      markets:["Salem APMC","Dharmapuri Market"],volatility:4
+    },
+    process:{
+      method:"Hot Air Drying (low temp)",preProcess:"Washing, destemming leaves, drying on mesh",
+      blanching:"No — raw drying preferred",dryTemp:"45–55°C (critical to stay low)",dryTime:"4–6 hours",
+      moisture:"≤5%",particleSize:"80–100 mesh",
+      costPerKg:"₹120–180",energy:"5.0–7.0 kWh/kg",
+      waste:"20–30%",byProducts:"Stem (compost, fibrous extract)"
+    },
+    storage:{
+      freshLife:"3–5 days (leaf)",dehyLife:"18–24 months",powderLife:"24–30 months",
+      temp:"Below 20°C — light & heat sensitive",humidity:"<50% RH",
+      packaging:"Laminated foil pouch / Tin (airtight)",
+      vacuum:"24–30 months",nitrogen:"30–36 months",
+      risks:"Chlorophyll degradation, vitamin loss at high temp, moisture absorption"
+    },
+    market:{
+      segment:"Health Food / Nutraceuticals / Export / Baby Food",
+      use:"Superfood powder, protein supplement blending, baby food fortification, smoothie base, cosmetics",
+      retail:"Very High",bulk:"Very High",exportDemand:"Very High",cagr:"15–18% CAGR",
+      buyers:["Health food brands USA","EU organic importers","Nutraceutical exporters","Baby food brands","Japan health brands"],
+      substitutes:"Spirulina powder, wheatgrass, spinach powder",
+      seasonality:"Year-round supply advantage; massive export demand"
+    },
+    suppliers:[
+      {id:11,name:"Tamil Nadu Moringa Farms",contact:"Karthik A",phone:"96XXXXXXXX",state:"Tamil Nadu",district:"Salem",size:"100 acres",moq:"2000 kg",reliability:9,terms:"Cash/7-day credit",note:"Year-round supply; organic certified; export-grade"},
+    ]
+  },
+  17:{
+    icon:"🌰",name:"Ashwagandha",sci:"Withania somnifera",cat:"Ayurvedic",sub:"Root",
+    powder:true,powderType:"Air Dried",difficulty:"Difficult",
+    yield:"30–40%",ratio:"2.5–3.5 kg fresh root : 1 kg powder",color:"Cream / Light Brown",
+    flavor:"Strong (bitter-pungent)",nutrients:"Withanolides (1.5–10%), Iron, Calcium, Alkaloids (somnine, somniferine)",
+    ayurvedic:"Adaptogen, anti-stress, testosterone booster, sleep aid, anti-anxiety, athletic performance",
+    industrial:"Pharma / Nutraceuticals / Supplements / Functional food",
+    demand:"V.High",export:true,grade:"A",
+    competitors:"KSM-66 (Ixoreal), Sensoril (Natreon), Organic India, Himalaya",
+    notes:"Highest CAGR (18–22%) of any Indian herbal product. Premium export pricing ₹800–1,500/kg. Withanolide % is key quality differentiator — get HPLC certified. Rajasthan Nagaur district produces highest withanolide %. KSM-66 is globally dominant brand.",
+    cagr:20,cost:"₹200–350/kg",
+    season:{
+      cropType:"Annual",sowing:"July – August",harvestStart:"January",
+      harvestEnd:"March",peak:"February",duration:"150–180 days",type:"Kharif",
+      annual:"Seasonal",cycles:"1 per year",climate:"Semi-arid, sandy loam; minimal water",
+      rainfall:"500–750 mm",temp:"20–38°C",yield:"0.5–1 tonne dry root/acre"
+    },
+    regions:[
+      {region:"Central",state:"Madhya Pradesh",district:"Mandsaur / Neemuch",belt:"Malwa Plateau",vol:"200,000 MT/yr",peak:"Jan–Mar",logistics:"₹1800–2800/tonne",avail:8},
+      {region:"Western",state:"Rajasthan",district:"Nagaur / Ajmer",belt:"Marwar Belt",vol:"150,000 MT/yr",peak:"Jan–Mar",logistics:"₹1800–2800/tonne",avail:8},
+    ],
+    prices:{
+      months:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+      min:[80,85,90,95,100,105,110,115,118,112,100,90],
+      avg:[110,115,120,125,130,135,140,145,148,140,125,112],
+      max:[150,160,165,170,175,180,185,190,195,185,170,155],
+      markets:["Mandsaur APMC","Nagaur Mandi"],volatility:6
+    },
+    process:{
+      method:"Hot Air Drying (root)",preProcess:"Washing, cutting roots into slices",
+      blanching:"No",dryTemp:"55–65°C",dryTime:"10–16 hours",
+      moisture:"≤10%",particleSize:"60–80 mesh",
+      costPerKg:"₹200–350",energy:"6.0–9.0 kWh/kg",
+      waste:"20–30%",byProducts:"Root extract concentrate (withanolide standardized extract)"
+    },
+    storage:{
+      freshLife:"6–12 months (dry root)",dehyLife:"24–36 months",powderLife:"24–36 months",
+      temp:"Below 25°C — cool dry",humidity:"<55% RH",
+      packaging:"HDPE / Kraft laminate / Tin",
+      vacuum:"36–48 months",nitrogen:"48–60 months",
+      risks:"Withanolide degradation, rancidity of root oils, moisture absorption"
+    },
+    market:{
+      segment:"Pharma / Nutraceuticals / Supplements / Sports",
+      use:"Stress-relief capsules, testosterone boosters, sleep supplements, athletic performance, anti-anxiety",
+      retail:"Very High",bulk:"Very High",exportDemand:"Very High",cagr:"18–22% CAGR",
+      buyers:["KSM-66 buyers","Sensoril buyers","GNC","Amazon supplement brands","EU supplement manufacturers","US pharma"],
+      substitutes:"Shatavari, Brahmi (different applications)",
+      seasonality:"Year-round demand; fastest growing supplement globally post-COVID"
+    },
+    suppliers:[
+      {id:3,name:"Malwa Spice Producers",contact:"Ramesh Verma",phone:"94XXXXXXXX",state:"Madhya Pradesh",district:"Mandsaur",size:"200 acres",moq:"2000 kg",reliability:9,terms:"30-day credit",note:"Direct from Malwa Plateau; withanolide testing available"},
+      {id:17,name:"MP Amla Growers",contact:"Dinesh Gupta",phone:"95XXXXXXXX",state:"Madhya Pradesh",district:"Chittorgarh",size:"150 acres",moq:"2000 kg",reliability:8,terms:"30-day credit",note:"Ashwagandha + Amla dual crop; good drying infra"},
+      {id:20,name:"Rajasthan Ashwagandha Growers",contact:"Hemraj Rathore",phone:"93XXXXXXXX",state:"Rajasthan",district:"Nagaur",size:"200 acres",moq:"2000 kg",reliability:9,terms:"30-day credit (FPO)",note:"Nagaur premium withanolide %; quality tested"},
+    ]
+  },
+  18:{
+    icon:"🟢",name:"Amla",sci:"Phyllanthus emblica",cat:"Ayurvedic",sub:"Fruit",
+    powder:true,powderType:"Spray Dried / Air Dried",difficulty:"Medium",
+    yield:"12–15%",ratio:"7–8 kg fresh : 1 kg powder",color:"Light Green / Beige",
+    flavor:"Strong (sour-astringent)",nutrients:"Vitamin C (highest natural source — 600–700 mg/100g), Tannins, Gallic acid, Emblicanin A & B",
+    ayurvedic:"Immunity, hair health, digestive, anti-aging, Rasayana (rejuvenator)",
+    industrial:"Food / Ayurveda / Cosmetics / Nutraceuticals / Hair care",
+    demand:"High",export:true,grade:"A",
+    competitors:"Organic India, Himalaya, Patanjali, Dabur",
+    notes:"20x Vitamin C of an orange — key marketing claim. Spray drying preferred to retain Vitamin C. Pratapgarh UP and Chittorgarh Rajasthan are top producing belts. Huge demand in hair care industry and Chyawanprash manufacturing.",
+    cagr:13,cost:"₹180–280/kg",
+    season:{
+      cropType:"Perennial tree",sowing:"Nov–Dec (seedling planting — 3-4 yr to fruit)",harvestStart:"November",
+      harvestEnd:"February",peak:"December–January",duration:"Perennial",type:"Rabi",
+      annual:"Annual",cycles:"1 per year",climate:"Dry subtropical; well-drained",
+      rainfall:"400–800 mm",temp:"8–42°C",yield:"3–5 tonnes fruit/acre"
+    },
+    regions:[
+      {region:"Northern",state:"Uttar Pradesh",district:"Pratapgarh / Allahabad",belt:"Pratapgarh Belt",vol:"700,000 MT/yr",peak:"Nov–Jan",logistics:"₹1500–2500/tonne",avail:9},
+      {region:"Western",state:"Rajasthan",district:"Chittorgarh / Bhilwara",belt:"Mewar Belt",vol:"300,000 MT/yr",peak:"Nov–Jan",logistics:"₹1800–2800/tonne",avail:8},
+    ],
+    prices:{
+      months:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+      min:[18,22,28,32,38,42,45,43,40,32,14,16],
+      avg:[22,28,36,42,50,58,62,58,52,42,18,20],
+      max:[35,40,50,58,68,75,80,75,68,55,26,28],
+      markets:["Pratapgarh APMC","Lucknow APMC"],volatility:7
+    },
+    process:{
+      method:"Spray Drying / Air Drying",preProcess:"Washing, deseeding, pulping / slicing",
+      blanching:"No",dryTemp:"Spray dry inlet 150–160°C",dryTime:"2–4 hours (SD)",
+      moisture:"≤5%",particleSize:"80–100 mesh",
+      costPerKg:"₹180–280",energy:"6.0–8.5 kWh/kg",
+      waste:"15–20%",byProducts:"Amla seed (seed oil extraction)"
+    },
+    storage:{
+      freshLife:"7–15 days",dehyLife:"18–24 months",powderLife:"24–30 months",
+      temp:"Below 20°C — Vitamin C sensitive",humidity:"<50% RH",
+      packaging:"Laminated foil / Tin (airtight, no oxygen)",
+      vacuum:"24–30 months",nitrogen:"30–36 months",
+      risks:"Vitamin C oxidation (highest risk), browning, hygroscopicity (caking)"
+    },
+    market:{
+      segment:"Ayurveda / Health Food / Cosmetics / Hair care",
+      use:"Hair care products, Vitamin C supplements, immunity products, Chyawanprash, skin serums",
+      retail:"High",bulk:"Very High",exportDemand:"High",cagr:"12–15% CAGR",
+      buyers:["Dabur (Chyawanprash)","Patanjali","Himalaya","Hair care brands","EU Vitamin-C supplement buyers"],
+      substitutes:"Synthetic Vitamin C (ascorbic acid) — not natural",
+      seasonality:"Year-round demand; peak procurement Nov–Mar"
+    },
+    suppliers:[
+      {id:17,name:"MP Amla Growers",contact:"Dinesh Gupta",phone:"95XXXXXXXX",state:"Madhya Pradesh",district:"Chittorgarh",size:"150 acres",moq:"2000 kg",reliability:8,terms:"30-day credit",note:"Amla + Ashwagandha farm; spray drying connection"},
+    ]
+  },
+  20:{
+    icon:"🌱",name:"Tulsi",sci:"Ocimum tenuiflorum",cat:"Ayurvedic",sub:"Leaf",
+    powder:true,powderType:"Air Dried",difficulty:"Easy",
+    yield:"10–12%",ratio:"8–10 kg fresh : 1 kg powder",color:"Dark Green",
+    flavor:"Strong (aromatic-pungent)",nutrients:"Eugenol, Ursolic Acid, Vitamin K, Iron, Calcium, Essential oils (1–3%)",
+    ayurvedic:"Adaptogen, respiratory support, immunomodulator, anti-stress, anti-fever",
+    industrial:"Food / Pharma / Herbal tea / Nutraceuticals / Cosmetics",
+    demand:"High",export:true,grade:"A",
+    competitors:"Organic India (Tulsi brand leader), Himalaya, Patanjali, Pukka Herbs UK",
+    notes:"Organic India built a global brand on Tulsi tea — validation of export potential. Karnataka and UP are dominant growing states. Year-round supply advantage. EU/US/Japan herbal tea market growing 12-15% annually.",
+    cagr:13,cost:"₹100–150/kg",
+    season:{
+      cropType:"Annual / Perennial",sowing:"March–April / June–July",harvestStart:"June",
+      harvestEnd:"October",peak:"August–September",duration:"60–90 days",type:"Kharif",
+      annual:"Annual",cycles:"2–3 per year",climate:"Warm; well-drained loam",
+      rainfall:"600–900 mm",temp:"15–35°C",yield:"2–3 tonnes fresh leaf/acre"
+    },
+    regions:[
+      {region:"Northern",state:"Uttar Pradesh",district:"Barabanki / Lucknow",belt:"UP Belt",vol:"500,000 MT/yr",peak:"Year-round",logistics:"₹1000–1800/tonne",avail:9},
+      {region:"Southern",state:"Karnataka",district:"Mysore / Chamrajnagar",belt:"Karnataka Belt",vol:"200,000 MT/yr",peak:"Year-round",logistics:"₹1000–1800/tonne",avail:8},
+    ],
+    prices:{
+      months:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+      min:[10,10,10,11,12,13,14,14,13,12,10,10],
+      avg:[15,15,15,16,18,20,22,22,20,18,15,15],
+      max:[22,22,22,24,28,32,35,35,30,26,22,22],
+      markets:["Lucknow APMC","Mysore Market"],volatility:4
+    },
+    process:{
+      method:"Hot Air Drying",preProcess:"Washing, sorting, light wilting",
+      blanching:"No",dryTemp:"45–55°C (low temp preserves eugenol)",dryTime:"3–5 hours",
+      moisture:"≤5%",particleSize:"80–100 mesh",
+      costPerKg:"₹100–150",energy:"4.5–6.0 kWh/kg",
+      waste:"20–30%",byProducts:"Stem (tulsi essential oil distillation)"
+    },
+    storage:{
+      freshLife:"3–7 days",dehyLife:"18–24 months",powderLife:"24–30 months",
+      temp:"Below 20°C",humidity:"<50% RH",
+      packaging:"Laminated foil / Tin",
+      vacuum:"24–30 months",nitrogen:"30–36 months",
+      risks:"Eugenol volatile aroma loss, chlorophyll degradation, moisture absorption"
+    },
+    market:{
+      segment:"Pharma / Herbal Tea / Nutraceuticals / Exports",
+      use:"Herbal tea blends, health supplements, immunity products, Ayurveda formulations, cosmetics",
+      retail:"High",bulk:"Very High",exportDemand:"Very High",cagr:"12–15% CAGR",
+      buyers:["Organic India","Himalaya","Twinings UK","Pukka Herbs","Dabur","EU herbal tea importers","US supplement brands"],
+      substitutes:"Green tea extract (different application)",
+      seasonality:"Year-round supply; export to EU/US/Japan booming"
+    },
+    suppliers:[
+      {id:14,name:"UP Herbal Collectif",contact:"Ranjit Kumar",phone:"91XXXXXXXX",state:"Uttar Pradesh",district:"Barabanki",size:"250 acres (FPO)",moq:"2000 kg",reliability:8,terms:"30-day credit (FPO)",note:"AYUSH Board registered; tulsi year-round supply"},
+    ]
+  },
+  23:{
+    icon:"🥒",name:"Bitter Gourd",sci:"Momordica charantia",cat:"Vegetable",sub:"Fruit",
+    powder:true,powderType:"Air Dried",difficulty:"Medium",
+    yield:"10–12%",ratio:"8–10 kg fresh : 1 kg powder",color:"Green / Olive",
+    flavor:"Strong (bitter)",nutrients:"Vitamin C, Iron, Folate, Momordicin, Charantin, Polypeptide-P, Vicine",
+    ayurvedic:"Anti-diabetic (blood sugar control), liver cleanse, anti-parasitic, digestive",
+    industrial:"Pharma / Nutraceuticals / Food / Ayurveda",
+    demand:"High",export:true,grade:"A",
+    competitors:"Organic India, Himalaya, Patanjali, Herbal Hills",
+    notes:"Charantin & Polypeptide-P are insulin-like compounds — huge pharma market. India has 77 million diabetics (growing) = massive domestic demand. Also strong export for anti-diabetic supplements to UK, USA, Middle East.",
+    cagr:11,cost:"₹80–120/kg",
+    season:{
+      cropType:"Annual",sowing:"Feb–Mar (Zaid) / Jun–Jul (Kharif)",harvestStart:"May",
+      harvestEnd:"August",peak:"June–July",duration:"60–90 days",type:"Kharif/Zaid",
+      annual:"Seasonal",cycles:"2–3 per year",climate:"Warm humid; well-drained",
+      rainfall:"600–900 mm",temp:"25–38°C",yield:"2–4 tonnes/acre"
+    },
+    regions:[
+      {region:"Central",state:"Uttar Pradesh",district:"Agra / Mathura",belt:"Yamuna Belt",vol:"600,000 MT/yr",peak:"Jun–Sep",logistics:"₹1000–1800/tonne",avail:8},
+      {region:"Southern",state:"Kerala",district:"Thrissur",belt:"Kerala Farms",vol:"200,000 MT/yr",peak:"Year-round",logistics:"₹1200–2000/tonne",avail:7},
+    ],
+    prices:{
+      months:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+      min:[14,14,12,12,12,14,16,15,14,14,14,14],
+      avg:[20,20,18,18,18,20,22,22,20,20,20,20],
+      max:[30,28,26,25,25,28,32,32,28,28,28,28],
+      markets:["Agra APMC","Thrissur Market"],volatility:5
+    },
+    process:{
+      method:"Hot Air Drying",preProcess:"Washing, slicing thin, removing seeds optional",
+      blanching:"No (blanching reduces bitterness — decide based on buyer requirement)",dryTemp:"55–65°C",dryTime:"8–12 hours",
+      moisture:"≤5%",particleSize:"60–80 mesh",
+      costPerKg:"₹80–120",energy:"4.5–6.5 kWh/kg",
+      waste:"15–20%",byProducts:"Seeds (charantin extract for pharma)"
+    },
+    storage:{
+      freshLife:"5–10 days",dehyLife:"12–18 months",powderLife:"18–24 months",
+      temp:"Below 25°C",humidity:"<55% RH",
+      packaging:"Laminated foil / HDPE",
+      vacuum:"24–30 months",nitrogen:"30–36 months",
+      risks:"Bitter compound volatilization, moisture absorption, color change"
+    },
+    market:{
+      segment:"Pharma / Nutraceuticals / Ayurveda",
+      use:"Anti-diabetic capsules, blood sugar supplement blends, health juices, Ayurvedic formulations",
+      retail:"High",bulk:"High",exportDemand:"High",cagr:"10–12% CAGR",
+      buyers:["Pharma companies","Nutraceutical brands","Ayurveda exporters","Himalaya","Patanjali","UK/US diabetic supplement brands"],
+      substitutes:"Fenugreek powder, jamun seed powder",
+      seasonality:"Year-round demand (pharma); supply peaks May–Sep"
+    },
+    suppliers:[
+      {id:19,name:"South India Bitter Herb Farm",contact:"Anand Pillai",phone:"92XXXXXXXX",state:"Kerala",district:"Thrissur",size:"70 acres",moq:"1000 kg",reliability:7,terms:"Cash",note:"Multi-Ayurvedic plant farm; pharma company supply"},
+    ]
+  },
+  25:{
+    icon:"🥦",name:"Broccoli",sci:"Brassica oleracea var. italica",cat:"Vegetable",sub:"Flower",
+    powder:true,powderType:"Freeze Dried / Air Dried",difficulty:"Medium",
+    yield:"9–12%",ratio:"8–10 kg fresh : 1 kg powder",color:"Green",
+    flavor:"Low–Medium",nutrients:"Sulforaphane, Vitamin C, K, Folate, Glucosinolates, Calcium, Iron",
+    ayurvedic:"Anti-cancer (sulforaphane), detox, immune boost, bone health",
+    industrial:"Food / Nutraceuticals / Pharma / Baby food",
+    demand:"Medium",export:true,grade:"A",
+    competitors:"BCFoods, Olam, Sensient, NOW Foods",
+    notes:"Premium product — freeze-dried broccoli commands 3–4x price over air-dried. Sulforaphane content is key quality parameter. Himachal Pradesh (Shimla hills) and Ooty belt are primary sources. Strong EU/USA export demand for organic grades.",
+    cagr:10,cost:"₹200–350/kg",
+    season:{
+      cropType:"Annual",sowing:"September – October",harvestStart:"November",
+      harvestEnd:"January",peak:"December",duration:"70–90 days",type:"Rabi",
+      annual:"Seasonal",cycles:"1 per year",climate:"Cool; well-drained loam",
+      rainfall:"600–800 mm",temp:"10–22°C",yield:"3–5 tonnes/acre"
+    },
+    regions:[
+      {region:"Northern",state:"Himachal Pradesh",district:"Shimla / Kullu",belt:"Shimla Hill Belt",vol:"100,000 MT/yr",peak:"Oct–Jan",logistics:"₹2500–4000/tonne",avail:6},
+      {region:"Southern",state:"Tamil Nadu",district:"Ooty (Nilgiris)",belt:"Nilgiri Hills Belt",vol:"50,000 MT/yr",peak:"Oct–Jan",logistics:"₹2000–3500/tonne",avail:6},
+    ],
+    prices:{
+      months:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+      min:[25,28,32,40,45,50,48,40,32,22,20,22],
+      avg:[40,45,50,60,70,78,75,62,50,35,32,36],
+      max:[58,65,75,88,100,115,110,90,72,52,48,55],
+      markets:["Shimla APMC","Nilgiri Hills Market"],volatility:7
+    },
+    process:{
+      method:"Freeze Drying / Air Drying",preProcess:"Washing, cutting florets",
+      blanching:"Yes — 2–3 min at 85°C (retains glucosinolates)",dryTemp:"50–60°C (AD) / -40°C (FD)",dryTime:"6–10 hours (AD)",
+      moisture:"≤5%",particleSize:"60–80 mesh",
+      costPerKg:"₹200–350 (FD much higher)",energy:"4.5 (AD) / 20–28 (FD) kWh/kg",
+      waste:"15–20%",byProducts:"Stalk (dietary fibre extract)"
+    },
+    storage:{
+      freshLife:"5–10 days",dehyLife:"18–24 months",powderLife:"24–30 months",
+      temp:"Below 20°C",humidity:"<50% RH",
+      packaging:"Laminated foil / Tin",
+      vacuum:"24–30 months",nitrogen:"36–42 months",
+      risks:"Sulforaphane/glucosinolate degradation, color fading (green→yellow)"
+    },
+    market:{
+      segment:"Health Food / Baby Food / Nutraceuticals",
+      use:"Health powder, baby food, soup mixes, anti-cancer supplements, EU organic brands",
+      retail:"Medium",bulk:"High",exportDemand:"High",cagr:"9–11% CAGR",
+      buyers:["EU organic health brands","Baby food manufacturers","Nutraceutical exporters","UK health food chains","US supplement brands"],
+      substitutes:"Cauliflower powder, spinach powder",
+      seasonality:"Year-round demand; peak buying Nov–Feb; EU/USA export strong"
+    },
+    suppliers:[
+      {id:13,name:"Himachal Hill Farms",contact:"Pradeep Thakur",phone:"96XXXXXXXX",state:"Himachal Pradesh",district:"Shimla",size:"45 acres",moq:"1000 kg",reliability:7,terms:"Cash advance",note:"Hill-grown premium broccoli; limited volumes; export-grade"},
+    ]
+  },
+};
+
+// Remaining products (simplified)
+const simpleProducts = {
+  8:{icon:"🥬",name:"Cabbage",sci:"Brassica oleracea var. capitata",cat:"Vegetable",sub:"Leaf",yield:"8–10%",demand:"Medium",export:true,grade:"B",cagr:6,cost:"₹70–100/kg",notes:"Used in instant noodle mixes and ramen seasoning. Rabi crop dominant. Large volume low-cost product. Blanching required."},
+  9:{icon:"🥦",name:"Cauliflower",sci:"Brassica oleracea var. botrytis",cat:"Vegetable",sub:"Flower",yield:"10–12%",demand:"Medium",export:false,grade:"B",cagr:7,cost:"₹70–100/kg",notes:"Season-specific Rabi crop. Punjab and Maharashtra dominant. Used in soup mixes and snack foods."},
+  10:{icon:"🌶",name:"Green Chili",sci:"Capsicum annuum",cat:"Vegetable",sub:"Fruit",yield:"15–18%",demand:"Medium",export:false,grade:"B",cagr:7,cost:"₹60–90/kg",notes:"Guntur Andhra Pradesh is India's chili capital. High capsaicin varieties for pharma. Andhra-Telangana belt dominant."},
+  11:{icon:"🫑",name:"Capsicum",sci:"Capsicum annuum var. grossum",cat:"Vegetable",sub:"Fruit",yield:"10–12%",demand:"High",export:true,grade:"A",cagr:9,cost:"₹150–225/kg",notes:"Natural food colorant (paprika). Freeze-dried premium market. EU export strong."},
+  14:{icon:"🌿",name:"Coriander",sci:"Coriandrum sativum",cat:"Herb",sub:"Leaf",yield:"8–10%",demand:"Medium",export:false,grade:"B",cagr:6,cost:"₹100–150/kg",notes:"Rapid perish — must dry within 24h of harvest. Rajasthan and Gujarat dominant."},
+  15:{icon:"🌾",name:"Fenugreek",sci:"Trigonella foenum-graecum",cat:"Herb",sub:"Leaf/Seed",yield:"10–13%",demand:"Medium",export:false,grade:"B",cagr:9,cost:"₹80–120/kg",notes:"Anti-diabetic and lactation booster pharma market. Rajasthan Jodhpur belt. Bitter flavor needs formulation."},
+  19:{icon:"🍃",name:"Neem",sci:"Azadirachta indica",cat:"Ayurvedic",sub:"Leaf",yield:"25–30%",demand:"Medium",export:false,grade:"B",cagr:7,cost:"₹60–90/kg",notes:"Pan-India availability. Pharma and cosmetics primary buyers. Azadirachtin is key active compound."},
+  21:{icon:"🫙",name:"Beetroot Red",sci:"Beta vulgaris rubra",cat:"Vegetable",sub:"Root",yield:"8–12%",demand:"High",export:true,grade:"A",cagr:13,cost:"₹180–280/kg",notes:"Sports nutrition and natural red colorant. EU/UK export market. Same as beetroot — premium spray-dried grade."},
+  22:{icon:"🎃",name:"Pumpkin",sci:"Cucurbita moschata",cat:"Vegetable",sub:"Fruit",yield:"8–10%",demand:"Medium",export:false,grade:"B",cagr:7,cost:"₹70–110/kg",notes:"Baby food segment growing. Low processing cost. High beta-carotene content."},
+  24:{icon:"🌿",name:"Drumstick",sci:"Moringa oleifera (pod)",cat:"Vegetable",sub:"Pod",yield:"12–15%",demand:"Medium",export:false,grade:"B",cagr:8,cost:"₹80–120/kg",notes:"Year-round availability South India. Cheap raw material. Moringa seed oil as by-product."},
+};
+
+// Merge simple products
+Object.keys(simpleProducts).forEach(id => {
+  if (!DB[id]) DB[id] = {...simpleProducts[id], id:parseInt(id),
+    powder:true,powderType:"Hot Air Drying",difficulty:"Easy",
+    ratio:"8–10 kg:1 kg",color:"Varies",flavor:"Medium",
+    nutrients:"See detailed research",ayurvedic:"Traditional uses",
+    industrial:"Food / Pharma",competitors:"Various",
+    season:{cropType:"Annual",sowing:"Seasonal",harvestStart:"Seasonal",harvestEnd:"Seasonal",peak:"Peak season",duration:"60–120 days",type:"Seasonal",annual:"Seasonal",cycles:"1–2/year",climate:"Tropical/subtropical",rainfall:"600–900 mm",temp:"15–35°C",yield:"3–8 tonnes/acre"},
+    regions:[{region:"Pan India",state:"Multiple States",district:"Various",belt:"Multiple belts",vol:"Variable",peak:"Seasonal",logistics:"₹1000–2500/tonne",avail:7}],
+    prices:{months:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],min:[8,9,10,11,13,15,16,15,13,10,8,8],avg:[12,14,16,18,20,22,24,22,20,16,12,12],max:[20,22,26,28,32,36,38,34,30,24,20,20],markets:["Regional APMC"],volatility:5},
+    process:{method:"Hot Air Drying",preProcess:"Washing, cutting",blanching:"As required",dryTemp:"55–65°C",dryTime:"6–10 hrs",moisture:"≤5%",particleSize:"60–100 mesh",costPerKg:"₹80–150",energy:"4.5–6.5 kWh/kg",waste:"15–20%",byProducts:"Peel / pomace"},
+    storage:{freshLife:"1–2 weeks",dehyLife:"12–18 months",powderLife:"18–24 months",temp:"Below 25°C",humidity:"<60% RH",packaging:"HDPE / Laminated pouch",vacuum:"24–30 months",nitrogen:"30–36 months",risks:"Moisture absorption, color degradation"},
+    market:{segment:"Food Processing",use:"Soups, seasonings, health powders",retail:"Medium",bulk:"Medium",exportDemand:"Medium",cagr:"6–9% CAGR",buyers:["Food processors","Spice companies"],substitutes:"Fresh product",seasonality:"Seasonal peaks"},
+    suppliers:[]
+  };
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════════════
+let currentId = null;
+let currentCat = "All";
+let priceChartInstance = null;
+let shelfChartInstance = null;
+
+// ── DEMAND COLOUR ──────────────────────────────────────────────────────────
+function demandColor(d){
+  return d==="V.High"?"#22c55e":d==="High"?"#f59e0b":d==="Medium"?"#0d9488":"#94a3b8";
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RENDER PRODUCT LIST
+// ═══════════════════════════════════════════════════════════════════════════
+function renderList(){
+  const q = document.getElementById("searchInput").value.toLowerCase();
+  const list = document.getElementById("productList");
+  list.innerHTML = "";
+  let count = 0;
+  for(let i=1;i<=25;i++){
+    const p = DB[i]; if(!p) continue;
+    if(currentCat!=="All" && p.cat!==currentCat) continue;
+    if(q && !p.name.toLowerCase().includes(q) && !String(i).includes(q)) continue;
+    count++;
+    const div = document.createElement("div");
+    div.className = "prod-card"+(currentId===i?" active":"");
+    div.onclick = ()=>loadProduct(i);
+    div.innerHTML=`
+      <span class="prod-id">${i}</span>
+      <div class="prod-thumb">${p.icon||"🌿"}</div>
+      <div class="prod-info">
+        <div class="prod-name">${p.name}</div>
+        <div class="prod-meta">${p.cat} · ${p.sub||""}</div>
+      </div>
+      <div>
+        <span class="prod-badge ${p.grade==="A"?"badge-a":"badge-b"}">${p.grade||"B"}</span>
+        <div class="demand-dot" style="background:${demandColor(p.demand)};margin-top:4px;margin-left:auto;"></div>
+      </div>
+    `;
+    list.appendChild(div);
+  }
+  if(count===0) list.innerHTML='<div class="empty">No products found</div>';
+}
+
+function setCat(cat,btn){
+  currentCat=cat;
+  document.querySelectorAll(".pill").forEach(p=>p.classList.remove("active"));
+  btn.classList.add("active");
+  renderList();
+}
+function filterProducts(){renderList();}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// QUICK GRID (Welcome)
+// ═══════════════════════════════════════════════════════════════════════════
+function renderQuickGrid(){
+  const qg = document.getElementById("quickGrid");
+  const picks=[1,13,17,16];
+  qg.innerHTML=picks.map(id=>{
+    const p=DB[id];
+    return `<div class="quick-item" onclick="loadProduct(${id})">
+      <div class="qi-icon">${p.icon}</div>
+      <div class="qi-name">${p.name}</div>
+      <div class="qi-id">ID ${id}</div>
+    </div>`;
+  }).join("");
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LOAD PRODUCT
+// ═══════════════════════════════════════════════════════════════════════════
+function loadProduct(id){
+  currentId=id;
+  const p=DB[id];
+  document.getElementById("welcomeScreen").style.display="none";
+  const dv=document.getElementById("detailView");
+  dv.className="detail show";
+  renderList();
+  // Header
+  document.getElementById("dh-icon").textContent=p.icon||"🌿";
+  document.getElementById("dh-title").textContent=p.name;
+  document.getElementById("dh-sci").textContent=p.sci;
+  // Tags
+  const tags=document.getElementById("dh-tags");
+  const dc=demandColor(p.demand);
+  tags.innerHTML=`
+    <span class="tag tag-cat">${p.cat}</span>
+    <span class="tag tag-sub">${p.sub||""}</span>
+    <span class="tag tag-demand" style="background:${dc}22;color:${dc};border-color:${dc}44">${p.demand} Demand</span>
+    <span class="tag" style="background:${p.export?"rgba(99,102,241,.15)":"rgba(71,85,105,.15)"};color:${p.export?"#a5b4fc":"#94a3b8"};border:1px solid ${p.export?"rgba(99,102,241,.3)":"rgba(71,85,105,.3)"}">${p.export?"✈ Export":"Domestic"}</span>
+    <span class="tag" style="background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.3)">Grade ${p.grade||"B"}</span>
+  `;
+  // KPIs
+  const kpis=document.getElementById("dh-kpis");
+  kpis.innerHTML=[
+    {v:p.yield,l:"Powder Yield",c:"#3b82f6"},
+    {v:p.ratio||"8–10:1",l:"Fresh:Powder",c:"#f59e0b"},
+    {v:p.cagr+"%",l:"Market CAGR",c:"#22c55e"},
+    {v:p.cost||"—",l:"Process Cost/kg",c:"#a78bfa"},
+  ].map(k=>`<div class="dh-kpi"><div class="dh-kpi-val" style="color:${k.c}">${k.v}</div><div class="dh-kpi-lbl">${k.l}</div></div>`).join("");
+  // Reset tabs
+  showTab("overview",document.querySelector(".tab-btn.active")||document.querySelector(".tab-btn"),true);
+  // Render panels
+  renderOverview(p);
+  renderSeason(p);
+  renderRegion(p);
+  renderPrice(p);
+  renderProcess(p);
+  renderStorage(p);
+  renderMarket(p);
+  renderSupplier(p);
+  document.getElementById("mainContent").scrollTop=0;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TAB SWITCHING
+// ═══════════════════════════════════════════════════════════════════════════
+function showTab(name,btn,skipBtn=false){
+  document.querySelectorAll(".tab-panel").forEach(p=>{p.classList.remove("active");});
+  document.getElementById("tab-"+name).classList.add("active");
+  if(!skipBtn){
+    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+    if(btn) btn.classList.add("active");
+  }
+  // Draw charts on tab show
+  if(name==="price"&&currentId) drawPriceChart(DB[currentId]);
+  if(name==="storage"&&currentId) drawShelfChart(DB[currentId]);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TAB 1 — OVERVIEW
+// ═══════════════════════════════════════════════════════════════════════════
+function renderOverview(p){
+  const el=document.getElementById("tab-overview");
+  const dr=(k,v,cls="")=>`<div class="data-row"><span class="dr-key">${k}</span><span class="dr-val ${cls}">${v||"—"}</span></div>`;
+  el.innerHTML=`
+    <div class="grid2" style="margin-top:16px">
+      <div class="sec-card">
+        <div class="sec-title">Product Profile</div>
+        ${dr("Scientific Name",`<em>${p.sci}</em>`)}
+        ${dr("Category",p.cat+" → "+p.sub)}
+        ${dr("Powder Possible",p.powder?"✅ Yes":"❌ No")}
+        ${dr("Powder Type",p.powderType,"accent")}
+        ${dr("Processing Difficulty",p.difficulty,"gold")}
+        ${dr("Color After Powder",p.color)}
+        ${dr("Flavor Strength",p.flavor)}
+      </div>
+      <div class="sec-card">
+        <div class="sec-title">Production Metrics</div>
+        ${dr("Yield After Dehydration",p.yield,"accent")}
+        ${dr("Fresh to Powder Ratio",p.ratio)}
+        ${dr("Processing Cost/kg",p.cost,"gold")}
+        ${dr("Market Demand",`<span style="color:${demandColor(p.demand)};font-weight:700">${p.demand}</span>`)}
+        ${dr("Export Demand",p.export?"✈ Yes (Export Ready)":"Domestic Focus")}
+        ${dr("Product Grade",`<span style="color:${p.grade==="A"?"#fbbf24":"#94a3b8"};font-weight:700">Grade ${p.grade||"B"}</span>`)}
+        ${dr("Market CAGR",`<span style="color:#22c55e;font-weight:700">${p.cagr}% CAGR</span>`)}
+      </div>
+    </div>
+    <div class="grid2" style="margin-top:16px">
+      <div class="sec-card">
+        <div class="sec-title">Nutritional Value</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7;padding:4px 0">${p.nutrients||"Data not available"}</div>
+        <div class="sec-title" style="margin-top:16px">Ayurvedic Uses</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7">${p.ayurvedic||"Not applicable"}</div>
+      </div>
+      <div class="sec-card">
+        <div class="sec-title">Industrial Applications</div>
+        <div class="chips">${(p.industrial||"Food").split("/").map(s=>`<div class="chip"><span class="chip-val" style="color:var(--accent2);font-size:14px">✓</span><div class="chip-key">${s.trim()}</div></div>`).join("")}</div>
+        <div class="sec-title" style="margin-top:20px">Competitor Brands</div>
+        <div style="font-size:12px;color:var(--text3);line-height:1.8">${(p.competitors||"Various brands").split(",").map(c=>`<span style="background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:2px 8px;margin:2px;display:inline-block;font-size:11px;color:var(--text2)">${c.trim()}</span>`).join("")}</div>
+      </div>
+    </div>
+    ${p.notes?`<div class="notes-box"><strong>💡 Business Insights: </strong>${p.notes}</div>`:""}
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TAB 2 — SEASONALITY
+// ═══════════════════════════════════════════════════════════════════════════
+function renderSeason(p){
+  const s=p.season;
+  const el=document.getElementById("tab-season");
+  const dr=(k,v,cls="")=>`<div class="data-row"><span class="dr-key">${k}</span><span class="dr-val ${cls}">${v||"—"}</span></div>`;
+  // Month availability visualization
+  const months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const sowingStr=(s.sowing||"").toLowerCase();
+  const harvestStr=(s.harvestStart||"").toLowerCase()+" "+(s.harvestEnd||"").toLowerCase();
+  const peakStr=(s.peak||"").toLowerCase();
+  const monthMap={jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+  function getStatus(i,sow,harv,pk){
+    const m=months[i].toLowerCase().slice(0,3);
+    if(pk.includes(m)||pk.includes(months[i].toLowerCase())) return "peak";
+    if(harv.includes(m)||harv.includes(months[i].toLowerCase())) return "active";
+    if(sow.includes(m)||sow.includes(months[i].toLowerCase())) return "sowing";
+    return "inactive";
+  }
+  const monthCells=months.map((m,i)=>{
+    const st=getStatus(i,sowingStr,harvestStr,peakStr);
+    let cls="month-inactive",style="",label="";
+    if(st==="peak"){cls="month-peak";label="Peak";}
+    else if(st==="active"){cls="month-active";label="Harvest";}
+    else if(st==="sowing"){cls="";style="background:rgba(99,102,241,.3);color:#a5b4fc";label="Sow";}
+    return `<div>
+      <div class="month-cell ${cls}" style="${style}" title="${label||m}">${m}</div>
+      ${label?`<div class="month-label" style="color:${st==="peak"?"#f59e0b":st==="active"?"#3b82f6":"#7c3aed"}">${label}</div>`:`<div class="month-label">—</div>`}
+    </div>`;
+  }).join("");
+  el.innerHTML=`
+    <div style="margin-top:16px">
+      <div class="sec-card" style="margin-bottom:16px">
+        <div class="sec-title">Crop Calendar</div>
+        <div class="month-grid">${monthCells}</div>
+        <div style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap;">
+          <span style="font-size:11px;color:var(--text3)"><span style="display:inline-block;width:10px;height:10px;background:#3b82f6;border-radius:2px;margin-right:4px;vertical-align:middle"></span>Harvest Season</span>
+          <span style="font-size:11px;color:var(--text3)"><span style="display:inline-block;width:10px;height:10px;background:#f59e0b;border-radius:2px;margin-right:4px;vertical-align:middle"></span>Peak Harvest</span>
+          <span style="font-size:11px;color:var(--text3)"><span style="display:inline-block;width:10px;height:10px;background:rgba(99,102,241,.4);border-radius:2px;margin-right:4px;vertical-align:middle"></span>Sowing Period</span>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="sec-card">
+          <div class="sec-title">Crop Details</div>
+          ${dr("Crop Type",s.cropType)}
+          ${dr("Sowing Month",s.sowing,"accent")}
+          ${dr("Harvest Start",s.harvestStart)}
+          ${dr("Harvest End",s.harvestEnd)}
+          ${dr("Peak Harvest",s.peak,"gold")}
+          ${dr("Crop Duration",s.duration)}
+          ${dr("Season Type",s.type)}
+          ${dr("Annual / Seasonal",s.annual)}
+          ${dr("Harvest Cycles/Year",s.cycles)}
+        </div>
+        <div class="sec-card">
+          <div class="sec-title">Growing Requirements</div>
+          ${dr("Climatic Requirement",s.climate)}
+          ${dr("Rainfall Needed",s.rainfall)}
+          ${dr("Temperature Range",s.temp)}
+          ${dr("Yield per Acre",s.yield,"teal")}
+          <div style="margin-top:16px">
+            <div class="sec-title">Yield Benchmark</div>
+            <div class="prog-wrap">
+              <div class="prog-label"><span>Yield per Acre</span><span>${s.yield}</span></div>
+              <div class="prog-bar"><div class="prog-fill" style="width:65%;background:var(--accent)"></div></div>
+            </div>
+            <div class="prog-wrap">
+              <div class="prog-label"><span>Crop Duration (relative)</span><span>${s.duration}</span></div>
+              <div class="prog-bar"><div class="prog-fill" style="width:55%;background:var(--gold)"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TAB 3 — REGIONS
+// ═══════════════════════════════════════════════════════════════════════════
+function renderRegion(p){
+  const el=document.getElementById("tab-region");
+  const regions=p.regions||[];
+  if(!regions.length){el.innerHTML='<div class="empty" style="margin-top:24px">No region data available</div>';return;}
+  const rows=regions.map(r=>{
+    const a=parseInt(r.avail)||5;
+    const dots=Array.from({length:10},(_,i)=>`<div class="avail-dot" style="background:${i<a?"var(--accent)":"var(--border)"}"></div>`).join("");
+    return `<tr>
+      <td><strong>${r.region}</strong></td>
+      <td style="color:var(--accent2)">${r.state}</td>
+      <td>${r.district}</td>
+      <td><span style="font-size:11px;color:var(--text3)">${r.belt}</span></td>
+      <td style="color:var(--gold2)">${r.vol}</td>
+      <td style="color:var(--teal2)">${r.peak}</td>
+      <td>${r.logistics}</td>
+      <td><div class="avail-bar"><div class="avail-dots">${dots}</div><span style="font-size:11px;margin-left:2px">${a}/10</span></div></td>
+    </tr>`;
+  }).join("");
+  const stateCards=regions.map((r,i)=>`
+    <div style="background:var(--card2);border:1px solid var(--border);border-left:3px solid ${["#3b82f6","#f59e0b","#0d9488","#7c3aed"][i%4]};border-radius:10px;padding:16px">
+      <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px">${r.state}</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:8px">📍 ${r.district}</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:4px">Belt: <span style="color:var(--accent2)">${r.belt}</span></div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:4px">Volume: <span style="color:var(--gold2)">${r.vol}</span></div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:4px">Peak: <span style="color:var(--teal2)">${r.peak}</span></div>
+      <div style="font-size:12px;color:var(--text2)">Logistics: ${r.logistics}</div>
+    </div>
+  `).join("");
+  el.innerHTML=`
+    <div style="margin-top:16px;display:flex;flex-direction:column;gap:16px">
+      <div class="sec-card">
+        <div class="sec-title">All Growing Regions — ${p.name}</div>
+        <div style="overflow-x:auto">
+          <table class="rtable">
+            <thead><tr>
+              <th>Region</th><th>State</th><th>District / Area</th>
+              <th>Major Belt</th><th>Volume</th><th>Peak Supply</th>
+              <th>Logistics Cost</th><th>Availability</th>
+            </tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      </div>
+      <div class="sec-title">State-wise Sourcing Cards</div>
+      <div class="grid${Math.min(regions.length,4)===1?"1":regions.length<=2?"2":"3"}" style="grid-template-columns:repeat(${Math.min(regions.length,3)},1fr)">${stateCards}</div>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TAB 4 — PRICING
+// ═══════════════════════════════════════════════════════════════════════════
+function renderPrice(p){
+  const el=document.getElementById("tab-price");
+  const pr=p.prices||{};
+  const vol=pr.volatility||5;
+  const volColor=vol>=8?"#f87171":vol>=6?"#f59e0b":"#22c55e";
+  el.innerHTML=`
+    <div style="margin-top:16px;display:flex;flex-direction:column;gap:16px">
+      <div class="grid3">
+        <div class="sec-card" style="text-align:center">
+          <div style="font-size:28px;font-weight:800;color:#3b82f6;font-family:'Barlow Condensed',sans-serif">
+            ₹${pr.avg?pr.avg[0]:0}/kg</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px">Jan Avg Farm Price</div>
+        </div>
+        <div class="sec-card" style="text-align:center">
+          <div style="font-size:28px;font-weight:800;color:#22c55e;font-family:'Barlow Condensed',sans-serif">
+            ₹${pr.min?Math.min(...pr.min):0}/kg</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px">Lowest Annual Price</div>
+        </div>
+        <div class="sec-card" style="text-align:center">
+          <div style="font-size:28px;font-weight:800;color:${volColor};font-family:'Barlow Condensed',sans-serif">${vol}/10</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px">Price Volatility Score</div>
+        </div>
+      </div>
+      <div class="sec-card">
+        <div class="sec-title">Monthly Farm Gate Price — Min / Avg / Max (₹/kg)</div>
+        <div class="price-chart-wrap"><canvas id="priceChart"></canvas></div>
+        <div style="font-size:11px;color:var(--text3);margin-top:8px">
+          Source: APMC / AGMARKNET data — ${(pr.markets||[]).join(", ")}
+        </div>
+      </div>
+      <div class="sec-card">
+        <div class="sec-title">Procurement Strategy</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:10px">Best Buy Window (Lowest Prices)</div>
+            ${(pr.months||[]).map((m,i)=>({m,v:pr.avg?pr.avg[i]:0})).sort((a,b)=>a.v-b.v).slice(0,4).map(({m,v})=>`
+              <div class="prog-wrap">
+                <div class="prog-label"><span style="color:var(--text2)">${m}</span><span style="color:var(--accent2)">₹${v}/kg avg</span></div>
+                <div class="prog-bar"><div class="prog-fill" style="width:${Math.round((v/(pr.avg?Math.max(...pr.avg):100))*100)}%;background:var(--accent)"></div></div>
+              </div>
+            `).join("")}
+          </div>
+          <div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:10px">Peak Season (Highest Prices — Avoid Buying)</div>
+            ${(pr.months||[]).map((m,i)=>({m,v:pr.avg?pr.avg[i]:0})).sort((a,b)=>b.v-a.v).slice(0,4).map(({m,v})=>`
+              <div class="prog-wrap">
+                <div class="prog-label"><span style="color:var(--text2)">${m}</span><span style="color:var(--rose2)">₹${v}/kg avg</span></div>
+                <div class="prog-bar"><div class="prog-fill" style="width:${Math.round((v/(pr.avg?Math.max(...pr.avg):100))*100)}%;background:var(--rose)"></div></div>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  // Chart drawn via showTab
+  setTimeout(()=>drawPriceChart(p),50);
+}
+
+function drawPriceChart(p){
+  const pr=p.prices||{};
+  if(!pr.months) return;
+  if(priceChartInstance){priceChartInstance.destroy();priceChartInstance=null;}
+  const ctx=document.getElementById("priceChart");
+  if(!ctx) return;
+  priceChartInstance=new Chart(ctx,{
+    type:"line",
+    data:{
+      labels:pr.months,
+      datasets:[
+        {label:"Max Price",data:pr.max,borderColor:"#f87171",backgroundColor:"rgba(248,113,113,.08)",fill:true,borderWidth:1.5,pointRadius:3,tension:.4},
+        {label:"Avg Price",data:pr.avg,borderColor:"#f59e0b",backgroundColor:"rgba(245,158,11,.1)",fill:true,borderWidth:2,pointRadius:4,tension:.4},
+        {label:"Min Price",data:pr.min,borderColor:"#22c55e",backgroundColor:"rgba(34,197,94,.12)",fill:true,borderWidth:1.5,pointRadius:3,tension:.4},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:"#94a3b8",font:{size:11}}},
+        tooltip:{backgroundColor:"#0d1320",borderColor:"#1e2d45",borderWidth:1,titleColor:"#3b82f6",bodyColor:"#e2e8f0",callbacks:{label:ctx=>`₹${ctx.parsed.y}/kg`}}
+      },
+      scales:{
+        x:{grid:{color:"rgba(30,45,69,.5)"},ticks:{color:"#94a3b8",font:{size:11}}},
+        y:{grid:{color:"rgba(30,45,69,.5)"},ticks:{color:"#94a3b8",font:{size:11},callback:v=>"₹"+v}}
+      }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TAB 5 — PROCESSING
+// ═══════════════════════════════════════════════════════════════════════════
+function renderProcess(p){
+  const pc=p.process||{};
+  const el=document.getElementById("tab-process");
+  const dr=(k,v,cls="")=>`<div class="data-row"><span class="dr-key">${k}</span><span class="dr-val ${cls}">${v||"—"}</span></div>`;
+  const diffColor={"Easy":"#22c55e","Medium":"#f59e0b","Difficult":"#f87171"}[p.difficulty]||"#94a3b8";
+  el.innerHTML=`
+    <div style="margin-top:16px;display:flex;flex-direction:column;gap:16px">
+      <div class="grid2">
+        <div class="sec-card">
+          <div class="sec-title">Dehydration Process</div>
+          ${dr("Method",pc.method,"accent")}
+          ${dr("Pre-Processing",pc.preProcess)}
+          ${dr("Blanching Required",pc.blanching)}
+          ${dr("Drying Temperature",pc.dryTemp,"gold")}
+          ${dr("Drying Time",pc.dryTime)}
+          ${dr("Target Moisture",pc.moisture,"teal")}
+          ${dr("Particle Size",pc.particleSize)}
+          ${dr("Processing Difficulty",`<span style="color:${diffColor};font-weight:700">${p.difficulty}</span>`)}
+        </div>
+        <div class="sec-card">
+          <div class="sec-title">Economics & Efficiency</div>
+          ${dr("Processing Cost/kg",pc.costPerKg,"gold")}
+          ${dr("Energy Consumption",pc.energy)}
+          ${dr("Waste Percentage",pc.waste,"rose")}
+          ${dr("By-Products",pc.byProducts)}
+          <div style="margin-top:16px">
+            <div class="sec-title">Cost Efficiency Score</div>
+            <div class="prog-wrap">
+              <div class="prog-label"><span>Cost Efficiency</span><span style="color:var(--accent2)">${pc.costPerKg}</span></div>
+              <div class="prog-bar"><div class="prog-fill" style="width:${pc.costPerKg?Math.max(20,100-parseInt(pc.costPerKg.replace(/[^0-9]/g,""))/3):50}%;background:var(--accent)"></div></div>
+            </div>
+            <div class="prog-wrap">
+              <div class="prog-label"><span>Waste Generated</span><span style="color:var(--rose2)">${pc.waste}</span></div>
+              <div class="prog-bar"><div class="prog-fill" style="width:${parseInt(pc.waste||"15")}%;background:var(--rose)"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sec-card">
+        <div class="sec-title">Processing Flow</div>
+        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:8px 0">
+          ${["Raw Material","Washing & Sorting","Pre-Processing","Blanching (if needed)","Dehydration / Drying","Grinding / Milling","Sieving","Quality Check","Packaging"].map((s,i)=>`
+            <div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:11px;color:var(--text2);font-weight:500">
+              <span style="color:var(--accent);margin-right:6px">${i+1}</span>${s}
+            </div>
+            ${i<8?'<span style="color:var(--text3);font-size:16px">→</span>':""}
+          `).join("")}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TAB 6 — STORAGE
+// ═══════════════════════════════════════════════════════════════════════════
+function renderStorage(p){
+  const st=p.storage||{};
+  const el=document.getElementById("tab-storage");
+  const dr=(k,v,cls="")=>`<div class="data-row"><span class="dr-key">${k}</span><span class="dr-val ${cls}">${v||"—"}</span></div>`;
+  el.innerHTML=`
+    <div style="margin-top:16px;display:flex;flex-direction:column;gap:16px">
+      <div class="grid3">
+        <div class="sec-card" style="text-align:center">
+          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Fresh Shelf Life</div>
+          <div style="font-size:26px;font-weight:800;color:#f87171;font-family:'Barlow Condensed',sans-serif">${st.freshLife||"—"}</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:4px">Before processing</div>
+        </div>
+        <div class="sec-card" style="text-align:center">
+          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Powder Shelf Life</div>
+          <div style="font-size:26px;font-weight:800;color:#f59e0b;font-family:'Barlow Condensed',sans-serif">${st.powderLife||"—"}</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:4px">Standard packaging</div>
+        </div>
+        <div class="sec-card" style="text-align:center">
+          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">N₂ Flush Shelf Life</div>
+          <div style="font-size:26px;font-weight:800;color:#22c55e;font-family:'Barlow Condensed',sans-serif">${st.nitrogen||"—"}</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:4px">Best option</div>
+        </div>
+      </div>
+      <div class="sec-card">
+        <div class="sec-title">Shelf Life Progression</div>
+        <div class="chart-wrap"><canvas id="shelfChart"></canvas></div>
+      </div>
+      <div class="grid2">
+        <div class="sec-card">
+          <div class="sec-title">Storage Conditions</div>
+          ${dr("Storage Temperature",st.temp,"accent")}
+          ${dr("Humidity Requirement",st.humidity)}
+          ${dr("Dehydrated Shelf Life",st.dehyLife,"gold")}
+          ${dr("Vacuum Pack Life",st.vacuum,"teal")}
+          ${dr("Nitrogen Pack Life",st.nitrogen,"teal")}
+        </div>
+        <div class="sec-card">
+          <div class="sec-title">Packaging Options</div>
+          ${dr("Recommended Packaging",st.packaging,"accent")}
+          <div style="margin-top:12px">
+            <div class="sec-title" style="margin-bottom:10px">Shelf Life Risk Factors</div>
+            <div style="background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:8px;padding:12px;font-size:12px;color:var(--rose2);line-height:1.6">
+              ⚠️ ${st.risks||"Standard storage precautions apply"}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  setTimeout(()=>drawShelfChart(p),50);
+}
+
+function drawShelfChart(p){
+  const st=p.storage||{};
+  if(shelfChartInstance){shelfChartInstance.destroy();shelfChartInstance=null;}
+  const ctx=document.getElementById("shelfChart");
+  if(!ctx) return;
+  function parseMonths(str){if(!str||str==="—")return 0;const m=str.match(/(\d+)/);return m?parseInt(m[1]):0;}
+  shelfChartInstance=new Chart(ctx,{
+    type:"bar",
+    data:{
+      labels:["Fresh Product","Dehydrated","Powder (Normal)","Vacuum Pack","N₂ Pack"],
+      datasets:[{
+        label:"Shelf Life (Months)",
+        data:[parseMonths(st.freshLife)*0.25,parseMonths(st.dehyLife),parseMonths(st.powderLife),parseMonths(st.vacuum),parseMonths(st.nitrogen)],
+        backgroundColor:["rgba(248,113,113,.7)","rgba(245,158,11,.7)","rgba(59,130,246,.7)","rgba(13,148,136,.7)","rgba(34,197,94,.7)"],
+        borderRadius:8,borderWidth:0,
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,indexAxis:"y",
+      plugins:{legend:{display:false},
+        tooltip:{backgroundColor:"#0d1320",borderColor:"#1e2d45",borderWidth:1,titleColor:"#60a5fa",bodyColor:"#e2e8f0",callbacks:{label:c=>`${c.parsed.x} months`}}
+      },
+      scales:{
+        x:{grid:{color:"rgba(30,45,69,.5)"},ticks:{color:"#94a3b8",font:{size:11},callback:v=>v+"mo"}},
+        y:{grid:{display:false},ticks:{color:"#e2e8f0",font:{size:11}}}
+      }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TAB 7 — MARKET
+// ═══════════════════════════════════════════════════════════════════════════
+function renderMarket(p){
+  const mk=p.market||{};
+  const el=document.getElementById("tab-market");
+  const dr=(k,v,cls="")=>`<div class="data-row"><span class="dr-key">${k}</span><span class="dr-val ${cls}">${v||"—"}</span></div>`;
+  const buyers=(mk.buyers||[]).map(b=>`<div class="buyer-item"><div class="buyer-dot"></div><div class="buyer-name">${b}</div></div>`).join("");
+  el.innerHTML=`
+    <div style="margin-top:16px;display:flex;flex-direction:column;gap:16px">
+      <div class="grid2">
+        <div class="sec-card">
+          <div class="sec-title">Market Overview</div>
+          ${dr("Market Segment",mk.segment,"accent")}
+          ${dr("Primary Uses",mk.use)}
+          ${dr("Market CAGR",`<span style="color:#22c55e;font-weight:700;font-size:14px">${mk.cagr}</span>`)}
+          ${dr("Demand Seasonality",mk.seasonality)}
+          ${dr("Substitute Products",mk.substitutes)}
+        </div>
+        <div class="sec-card">
+          <div class="sec-title">Demand Analysis</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+            ${[["Retail",mk.retail],["Bulk",mk.bulk],["Export",mk.exportDemand]].map(([l,v])=>{
+              const c=v==="Very High"?"#22c55e":v==="High"?"#f59e0b":"#0d9488";
+              return `<div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center">
+                <div style="font-size:13px;font-weight:700;color:${c}">${v||"Medium"}</div>
+                <div style="font-size:10px;color:var(--text3);margin-top:2px">${l} Demand</div>
+              </div>`;
+            }).join("")}
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Applications</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.7">${mk.use}</div>
+          </div>
+        </div>
+      </div>
+      <div class="sec-card">
+        <div class="sec-title">Major Buyers & End Markets</div>
+        <div style="columns:2;gap:16px">${buyers}</div>
+      </div>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TAB 8 — SUPPLIERS
+// ═══════════════════════════════════════════════════════════════════════════
+function renderSupplier(p){
+  const sups=p.suppliers||[];
+  const el=document.getElementById("tab-supplier");
+  if(!sups.length){
+    el.innerHTML=`<div style="margin-top:16px"><div class="sec-card"><div class="empty">No specific supplier data for this product. Contact regional APMC / FPOs in the growing belts listed under Regions tab.</div></div></div>`;
+    return;
+  }
+  const cards=sups.map(s=>{
+    const rel=s.reliability||5;
+    const stars=Array.from({length:10},(_,i)=>`<span class="rel-star" style="color:${i<rel?"#f59e0b":"#1e2d45"}">${i<rel?"★":"★"}</span>`).join("");
+    return `<div class="sup-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div class="sup-name">🏭 ${s.name}</div>
+        <div style="font-size:11px;color:#f59e0b">${rel}/10 Reliability</div>
+      </div>
+      <div class="rel-stars" style="margin-bottom:8px">${stars}</div>
+      <div class="grid2" style="gap:8px;margin-bottom:8px">
+        <div style="font-size:11px;color:var(--text3)">👤 Contact: <span style="color:var(--text2)">${s.contact}</span></div>
+        <div style="font-size:11px;color:var(--text3)">📱 Phone: <span style="color:var(--text2)">${s.phone}</span></div>
+        <div style="font-size:11px;color:var(--text3)">📍 Location: <span style="color:var(--accent2)">${s.district}, ${s.state}</span></div>
+        <div style="font-size:11px;color:var(--text3)">🌾 Farm Size: <span style="color:var(--text2)">${s.size}</span></div>
+        <div style="font-size:11px;color:var(--text3)">📦 Min Order: <span style="color:var(--gold2)">${s.moq}</span></div>
+        <div style="font-size:11px;color:var(--text3)">💳 Terms: <span style="color:var(--text2)">${s.terms}</span></div>
+      </div>
+      ${s.note?`<div style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.15);border-radius:6px;padding:8px;font-size:11px;color:var(--text3)">💡 ${s.note}</div>`:""}
+    </div>`;
+  }).join("");
+  el.innerHTML=`
+    <div style="margin-top:16px;display:flex;flex-direction:column;gap:0">
+      <div class="sec-card">
+        <div class="sec-title">Verified Supplier Contacts</div>
+        ${cards}
+        <div style="background:rgba(13,148,136,.08);border:1px solid rgba(13,148,136,.2);border-radius:8px;padding:12px;margin-top:12px;font-size:12px;color:var(--teal2)">
+          💡 <strong>Tip:</strong> Always visit APMC mandi and meet farmers directly before finalizing contracts. Register on <strong>AgriMarket / eNAM portal</strong> for additional supplier discovery. FPO (Farmer Producer Organizations) give better pricing and volume guarantees.
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════════
+renderList();
+renderQuickGrid();
+</script>
+</body>
+</html>
